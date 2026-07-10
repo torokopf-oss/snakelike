@@ -39,7 +39,9 @@ function updatePlayer() {
             foods.splice(i, 1);
             ateApple = true;
             applesEaten++; eggAppleCounter++;
-            score += 10; scoreSpan.textContent = score;
+            score += 10 + applesEatenTotal;
+            applesEatenTotal++; 
+            scoreSpan.textContent = score;
             snake[snake.length - 1].glowUntil = performance.now() + 500;
             break;
         }
