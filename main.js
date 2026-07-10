@@ -2,7 +2,7 @@ function resetGame() {
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     snake = [{ x: 10, y: 10 }]; prevSnake = [{ x: 10, y: 10 }];
     dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
-    score = 0; playerPoopsEaten = 0; applesEaten = 0;
+    score = 0; playerPoopsEaten = 0; applesEaten = 0; applesEatenTotal = 0;
     scoreSpan.textContent = '0'; poopEatenSpan.textContent = '0/5'; gameOverDiv.textContent = '';
     gameRunning = true; gameOverFlag = false; paused = false;
     poisonActive = false; lastPoisonCheck = 0; pill = null; sickParticles = [];
