@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Змейка (модульная)</title>
+    <style>
+        body {
+            margin: 0; padding: 0;
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh;
+            background: #1a1a2e;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            user-select: none;
+            overflow: hidden;
+        }
+        .game-container { text-align: center; }
+        canvas {
+            border: 2px solid #e94560;
+            background: #16213e;
+            display: block; margin: 0 auto;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+            max-width: 100%;
+        }
+        .info {
+            color: white; margin-bottom: 10px; font-size: 18px;
+            display: flex; justify-content: space-between;
+            width: 400px; margin-left: auto; margin-right: auto;
+            align-items: center;
+        }
+        .info > span {
+            display: inline-block;
+            width: 100px;
+            text-align: center;
+            white-space: nowrap;
+        }
+        .game-over-text {
+            color: #e94560; font-size: 28px; margin-top: 10px; height: 34px;
+        }
+    </style>
+</head>
+<body>
+<div class="game-container">
+    <div class="info">
+        <span>🍎 Очки: <span id="scoreDisplay">0</span></span>
+        <span>💩 <span id="poopEatenDisplay">0/5</span></span>
+        <span>🏆 Рекорд: <span id="highScoreDisplay">0</span></span>
+    </div>
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+    <div class="game-over-text" id="gameOverText"></div>
+    <p style="color: #aaa; margin-top: 10px;">Управление: стрелки ←↑↓→ | Z — лазер (после стены) / пуля | S — санация | X — яйцо / вылупить | P — пауза | Пробел — старт / тюрьма / рестарт</p>
+    <p style="color: #888; font-size: 14px;">Отравление -5% очков/сек. Лазер / пуля убивает Говноеда, стервятников и яблоко.</p>
+</div>
+
+<!-- Загрузка модулей в правильном порядке -->
+<script src="config.js"></script>
+<script src="state.js"></script>
+<script src="render.js"></script>
+<script src="snake.js"></script>
+<script src="enemies.js"></script>
+<script src="babies.js"></script>
+<script src="jail.js"></script>
+<script src="input.js"></script>
+<script src="main.js"></script>
+</body>
+</html>
