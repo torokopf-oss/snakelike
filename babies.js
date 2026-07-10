@@ -60,34 +60,32 @@ function updateBabies() {
         }
         baby.unshift(newHead);
         const foodIdx = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
-       if (foodIdx !== -1) {
-    foods.splice(foodIdx, 1);
-    score += 2; scoreSpan.textContent = score; applesEaten++;
-    pushNewFoodCell();
+        if (foodIdx !== -1) {
+            foods.splice(foodIdx, 1);
+            score += 2; scoreSpan.textContent = score; applesEaten++;
+            pushNewFoodCell();
 
-    // Какашка позади хвоста детёныша
-    if (applesEaten % 2 === 0) {
-        const tail = baby[baby.length - 1];
-        const d = babyDirections[b];
-        const behind = { x: tail.x - d.x, y: tail.y - d.y };
-        if (isCellFree(behind.x, behind.y)) {
-            poops.push(behind);
-        } else {
-            // если клетка занята, ищем свободную рядом
-            const neighbors = [
-                { x: tail.x + 1, y: tail.y },
-                { x: tail.x - 1, y: tail.y },
-                { x: tail.x, y: tail.y + 1 },
-                { x: tail.x, y: tail.y - 1 }
-            ];
-            const free = neighbors.filter(nb => isCellFree(nb.x, nb.y));
-            if (free.length) poops.push(free[Math.floor(Math.random() * free.length)]);
-        }
-    }
+            // Какашка позади хвоста детёныша
+            if (applesEaten % 2 === 0) {
+                const tail = baby[baby.length - 1];
+                const d = babyDirections[b];
+                const behind = { x: tail.x - d.x, y: tail.y - d.y };
+                if (isCellFree(behind.x, behind.y)) {
+                    poops.push(behind);
+                } else {
+                    const neighbors = [
+                        { x: tail.x + 1, y: tail.y },
+                        { x: tail.x - 1, y: tail.y },
+                        { x: tail.x, y: tail.y + 1 },
+                        { x: tail.x, y: tail.y - 1 }
+                    ];
+                    const free = neighbors.filter(nb => isCellFree(nb.x, nb.y));
+                    if (free.length) poops.push(free[Math.floor(Math.random() * free.length)]);
+                }
+            }
 
-    if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
-    else baby.pop();
-}
+            if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
+            else baby.pop();
         } else {
             baby.pop();
         }
