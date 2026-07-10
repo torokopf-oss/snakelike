@@ -63,6 +63,7 @@ function updateBabies() {
         if (foodIdx !== -1) {
             foods.splice(foodIdx, 1);
             score += 2; scoreSpan.textContent = score; applesEaten++;
+            if (applesEaten % 2 === 0) spawnPoop();
             pushNewFoodCell();
             if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
             else baby.pop();
