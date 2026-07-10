@@ -6,9 +6,17 @@ function updateBabies() {
         const head = baby[0];
         let fleeTarget = null;
         if (poopSnakeActive && poopSnake.length > 0) {
-            const d = Math.abs(poopSnake[0].x - head.x) + Math.abs(poopSnake[0].y - head.y);
-            if (d <= 5) fleeTarget = poopSnake[0];
+    let minDist = Infinity;
+    let closestSeg = null;
+    for (const seg of poopSnake) {
+        const d = Math.abs(seg.x - head.x) + Math.abs(seg.y - head.y);
+        if (d < minDist) {
+            minDist = d;
+            closestSeg = seg;
         }
+    }
+    if (closestSeg && minDist <= 5) fleeTarget = closestSeg;
+}
         if (!fleeTarget) {
             for (const v of vultures) {
                 const d = Math.abs(v.x - head.x) + Math.abs(v.y - head.y);
