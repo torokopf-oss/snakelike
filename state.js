@@ -16,6 +16,7 @@ let playerPoopsEaten = 0;
 let foods = [], prevFoods = [];
 let poops = [];
 let applesEaten = 0;
+let applesEatenTotal = 0;
 let poisonActive = false, lastPoisonCheck = 0;
 let pill = null;
 let sickParticles = [];
