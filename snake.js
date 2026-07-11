@@ -38,8 +38,7 @@ function updatePlayer() {
         if (newHead.x === foods[i].x && newHead.y === foods[i].y) {
             foods.splice(i, 1);
             ateApple = true;
-            applesEaten++; eggAppleCounter++;
-            score += 10 + applesEatenTotal;
+            applesEaten++;
             score += 10 + Math.floor(snake.length / 2);
             scoreSpan.textContent = score;
             snake[snake.length - 1].glowUntil = performance.now() + 500;
