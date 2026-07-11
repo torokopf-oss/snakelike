@@ -34,9 +34,8 @@ window.addEventListener('keydown', e => {
     
     // Новое условие: длина >= 25, кулдаун по времени (44 сек), и яблочный счётчик
     const canLay = gameRunning && snake.length >= 25 && !egg && eggCooldown <= 0 
-                   && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
-                   && !awaitingJailStart && !jailMode 
-                   && (!firstEggLaid || eggAppleCounter >= 10);
+               && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
+               && !awaitingJailStart && !jailMode;
     if (canLay) {
         egg = { x: snake[snake.length-1].x, y: snake[snake.length-1].y };
         lastEggTime = performance.now();
