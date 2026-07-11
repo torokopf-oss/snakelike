@@ -40,8 +40,8 @@ function updatePlayer() {
             ateApple = true;
             applesEaten++; eggAppleCounter++;
             score += 10 + applesEatenTotal;
+            score += 10 + Math.floor(snake.length / 2);
             scoreSpan.textContent = score;
-            applesEatenTotal++;
             snake[snake.length - 1].glowUntil = performance.now() + 500;
             break;
         }
