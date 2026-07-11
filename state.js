@@ -40,6 +40,7 @@ let worldDiscovered = false;
 
 let egg = null, eggCooldown = 0;
 let firstEggLaid = false, eggAppleCounter = 0;
+let lastEggTime = 0;  
 let babySnakes = [], babyPrevSnakes = [], babyDirections = [];
 let awaitingHatch = false;
 let hadBabies = false;
