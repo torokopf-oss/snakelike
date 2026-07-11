@@ -39,7 +39,7 @@ function updatePlayer() {
             foods.splice(i, 1);
             ateApple = true;
             applesEaten++;
-            score += 10 + Math.floor(snake.length / 2);
+            score += 10 + snake.length; 
             scoreSpan.textContent = score;
             snake[snake.length - 1].glowUntil = performance.now() + 500;
             break;
