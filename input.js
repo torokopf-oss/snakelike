@@ -1,19 +1,34 @@
 window.addEventListener('keydown', e => {
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight',' ','z','Z','x','X',']','p','P','s','S'].includes(e.key)) e.preventDefault();
-    if (e.key === 'p' || e.key === 'P') {
+    // Блокируем стандартное поведение для всех игровых клавиш (по физическому коду)
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight'].includes(e.code)) {
+        e.preventDefault();
+    }
+
+    // Пауза
+    if (e.code === 'KeyP') {
         if (gameRunning && !gameOverFlag && !awaitingHatch && !jailMode && !jailCountdown) {
             paused = !paused;
             if (!paused) lastUpdateTime = performance.now();
         }
         return;
     }
-    if (e.key === ' ') {
-        if (awaitingJailStart) { awaitingJailStart = false; jailCountdown = true; jailCountdownValue = CONFIG.countdownSeconds; jailCountdownStart = performance.now(); return; }
+
+    // Пробел (старт / тюрьма / рестарт)
+    if (e.code === 'Space') {
+        if (awaitingJailStart) {
+            awaitingJailStart = false;
+            jailCountdown = true;
+            jailCountdownValue = CONFIG.countdownSeconds;
+            jailCountdownStart = performance.now();
+            return;
+        }
         if (gameOverFlag) { resetGame(); return; }
         if (!gameRunning && !awaitingHatch) { resetGame(); return; }
         return;
     }
-    if (e.key === 'x' || e.key === 'X') {
+
+    // Яйцо / вылупление
+    if (e.code === 'KeyX') {
         if (awaitingHatch) { hatchPlayerFromEgg(); return; }
         if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
         const canLay = gameRunning && snake.length >= 25 && !egg && eggCooldown <= 0 && !awaitingJailStart && !jailMode && (!firstEggLaid || eggAppleCounter >= 10);
@@ -23,25 +38,30 @@ window.addEventListener('keydown', e => {
         }
         return;
     }
-    if (e.key === ']') { activateCheats(); return; }
+
+    // Чит-режим
+    if (e.code === 'BracketRight') { activateCheats(); return; }
 
     // Санация
-    if ((e.key === 's' || e.key === 'S') && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) {
+    if (e.code === 'KeyS' && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) {
         activateSanitation();
         return;
     }
 
+    // Остальные клавиши работают только во время активной игры
     if (!gameRunning || awaitingHatch || paused) return;
+
+    // Управление в тюрьме
     if (jailMode) {
-        if (e.key==='ArrowUp' && jailDir.y!==1) jailNextDir = {x:0,y:-1};
-        else if (e.key==='ArrowDown' && jailDir.y!==-1) jailNextDir = {x:0,y:1};
-        else if (e.key==='ArrowLeft' && jailDir.x!==1) jailNextDir = {x:-1,y:0};
-        else if (e.key==='ArrowRight' && jailDir.x!==-1) jailNextDir = {x:1,y:0};
+        if (e.code === 'ArrowUp' && jailDir.y !== 1) jailNextDir = {x:0,y:-1};
+        else if (e.code === 'ArrowDown' && jailDir.y !== -1) jailNextDir = {x:0,y:1};
+        else if (e.code === 'ArrowLeft' && jailDir.x !== 1) jailNextDir = {x:-1,y:0};
+        else if (e.code === 'ArrowRight' && jailDir.x !== -1) jailNextDir = {x:1,y:0};
         return;
     }
 
     // Выстрел (лазер или пуля)
-    if (e.key === 'z' || e.key === 'Z') {
+    if (e.code === 'KeyZ') {
         if (worldDiscovered) {
             if (dir.x || dir.y) fireLaser();
             return;
@@ -53,8 +73,8 @@ window.addEventListener('keydown', e => {
         return;
     }
 
-    // Классическое управление – запись в nextDir
-    switch (e.key) {
+    // Направления движения
+    switch (e.code) {
         case 'ArrowUp':    nextDir = {x:0,y:-1}; break;
         case 'ArrowDown':  nextDir = {x:0,y:1}; break;
         case 'ArrowLeft':  nextDir = {x:-1,y:0}; break;
