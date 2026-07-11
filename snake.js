@@ -112,7 +112,6 @@ function hatchPlayerFromEgg() {
     if (!egg) return;
     score = Math.floor(score * 2 / 3);
     scoreSpan.textContent = score;
-    applesEatenTotal = 0;
     snake = [{ ...egg }]; prevSnake = [{ ...egg }];
     dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 };
     egg = null; awaitingHatch = false; gameRunning = true; gameOverFlag = false; gameOverDiv.textContent = '';
