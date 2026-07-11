@@ -8,5 +8,5 @@ const CONFIG = {
     bulletSpeed: 2,
     countdownSeconds: 3,
     vultureSpeedDivider: 2, vultureThreshold: 5,
-    eggCooldownMs: 44000
+    eggCooldownMs: 5000
 };
