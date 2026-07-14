@@ -11,8 +11,9 @@ function resetGame() {
     poopSnakeJustSpawned = false; warningActive = false; warningPulse = 0; spawnSide = -1;
     poopSnakeMessageText = ''; poopSnakeMessageUntil = 0;
     bullet = null; prevBullet = null;
-    sanitationCharges = 2;
-    sanitationScoreThreshold = 500;
+    sanitationCharges = 0;
+    nextSanitationScore = 1000;
+    sanitationMilestoneReached = false;
     jailMode = false; jailSnake = []; jailPrevSnake = []; awaitingJailStart = false; awaitingJailReason = '';
     jailCountdown = false; flashStart = 0; laserStart = 0;
     worldDiscovered = false; canvas.width = 400;
@@ -110,7 +111,16 @@ function updateGame() {
     if (!worldDiscovered) updateBullet();
     updatePoison();
     updateBabies();
-
+// Начисление зарядов санации
+if (!sanitationMilestoneReached && score >= 1000) {
+    sanitationCharges += 2;
+    sanitationMilestoneReached = true;
+    nextSanitationScore = 1500;   // следующий порог после первых 1000
+}
+if (sanitationMilestoneReached && score >= nextSanitationScore) {
+    sanitationCharges++;
+    nextSanitationScore += 500;   // каждые 500 очков
+}
     vultureMoveCounter++;
     if (vultureMoveCounter >= CONFIG.vultureSpeedDivider) { updateVultures(); vultureMoveCounter = 0; }
 
