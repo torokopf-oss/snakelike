@@ -128,7 +128,9 @@ function drawGame(t, now) {
         ctx.restore();
     }
 
-    const canLayEgg = gameRunning && snake.length >= 25 && !egg && eggCooldown <= 0 && !awaitingJailStart && !jailMode && (!firstEggLaid || eggAppleCounter >= 10);
+    const canLayEgg = gameRunning && snake.length >= 25 && !egg
+                  && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
+                  && !awaitingJailStart && !jailMode;
     const headCol = poisonActive ? '#2ecc71' : (canLayEgg ? '#f1c40f' : '#e94560');
     const bodyCol = poisonActive ? '#2ecc71' : (canLayEgg ? '#f39c12' : '#533483');
     const glowActive = poisonActive || canLayEgg;
