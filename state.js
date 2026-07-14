@@ -28,7 +28,8 @@ let warningActive = false, warningPulse = 0, spawnSide = -1;
 let poopSnakeMessageText = '', poopSnakeMessageUntil = 0;
 
 let bullet = null, prevBullet = null;
-
+let sanitationCharges = 2;
+let sanitationScoreThreshold = 500;   // ближайший порог для нового заряда
 let jailMode = false, jailSnake = [], jailPrevSnake = [];
 let jailDir = { x: 0, y: 0 }, jailNextDir = { x: 0, y: 0 };
 let jailStartTime = 0;
