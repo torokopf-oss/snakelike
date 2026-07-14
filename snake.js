@@ -13,7 +13,8 @@ function updatePlayer() {
    if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < CONFIG.fullHeight) {
     worldDiscovered = true;
     canvas.width = CONFIG.fullWidth * CONFIG.gridSize;
-    
+    lastEggTime = performance.now();
+       
     // 1. Вылупление из яйца (если есть)
     if (egg) {
         spawnBabyFromEgg();
