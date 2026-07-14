@@ -16,9 +16,7 @@ function updatePlayer() {
     lastEggTime = performance.now();
        
     // 1. Вылупление из яйца (если есть)
-    if (egg) {
-        spawnBabyFromEgg();
-    }
+
     
     // 2. Укорачиваем змейку вдвое
     const newLen = Math.floor(snake.length / 2);
