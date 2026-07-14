@@ -106,7 +106,11 @@ function drawGame(t, now) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-
+ctx.fillStyle = 'white';
+ctx.font = '14px "Segoe UI"';
+ctx.textAlign = 'right';
+ctx.fillText(`Санация: ${sanitationCharges}`, canvas.width - 10, canvas.height - 10);
+    
     // Стена
     if (!worldDiscovered && snake.length >= 30) {
         const wallX = CONFIG.viewWidth * gs;
