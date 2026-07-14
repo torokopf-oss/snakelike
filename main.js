@@ -100,11 +100,16 @@ function updateGame() {
     if (jailCountdown) { updateCountdown(); return; }
     if (jailMode) { updateJail(); return; }
     if (awaitingHatch) return;
-    // Пополнение зарядов санации
-    if (score >= sanitationScoreThreshold) {
-    sanitationCharges++;
-    sanitationScoreThreshold += 500;   // следующая цель
-}
+     // Пополнение зарядов санации
+    if (!sanitationMilestoneReached && score >= 1000) {
+        sanitationCharges += 2;
+        sanitationMilestoneReached = true;
+        nextSanitationScore = 1500;
+    }
+    if (sanitationMilestoneReached && score >= nextSanitationScore) {
+        sanitationCharges++;
+        nextSanitationScore += 500;
+    }
 
     prevVultures = vultures.map(v => ({...v}));
     updatePlayer();
