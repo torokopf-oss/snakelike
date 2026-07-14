@@ -28,16 +28,22 @@ window.addEventListener('keydown', e => {
     }
 
     // Яйцо / вылупление
-    if (e.code === 'KeyX') {
-        if (awaitingHatch) { hatchPlayerFromEgg(); return; }
-        if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
-        const canLay = gameRunning && snake.length >= 25 && !egg && eggCooldown <= 0 && !awaitingJailStart && !jailMode && (!firstEggLaid || eggAppleCounter >= 10);
-        if (canLay) {
-            egg = { x: snake[snake.length-1].x, y: snake[snake.length-1].y };
-            eggCooldown = 25; firstEggLaid = true; eggAppleCounter = 0;
-        }
-        return;
+   if (e.code === 'KeyX') {
+    if (awaitingHatch) { hatchPlayerFromEgg(); return; }
+    if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
+    
+   const canLay = gameRunning && snake.length >= 25 && !egg
+               && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
+               && !awaitingJailStart && !jailMode;
+       
+    if (canLay) {
+        egg = { x: snake[snake.length-1].x, y: snake[snake.length-1].y };
+        lastEggTime = performance.now();
+        firstEggLaid = true;
+        eggAppleCounter = 0;
     }
+    return;
+}
 
     // Чит-режим
     if (e.code === 'BracketRight') { activateCheats(); return; }

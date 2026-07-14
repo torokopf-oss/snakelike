@@ -7,5 +7,6 @@ const CONFIG = {
     jailDuration: 10000, jailWidth: 7, jailHeight: 4,
     bulletSpeed: 2,
     countdownSeconds: 3,
-    vultureSpeedDivider: 2, vultureThreshold: 5
+    vultureSpeedDivider: 2, vultureThreshold: 5,
+    eggCooldownMs: 35000
 };

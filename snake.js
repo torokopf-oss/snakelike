@@ -10,18 +10,38 @@ function updatePlayer() {
     const head = snake[0];
     let newHead = { x: head.x + dir.x, y: head.y + dir.y };
 
-    // Пробитие стены (длина 30), автоматическое вылупление детёныша
-    if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < CONFIG.fullHeight) {
-        worldDiscovered = true;
-        canvas.width = CONFIG.fullWidth * CONFIG.gridSize;
-        const newLen = Math.floor(snake.length / 2);
-        snake = snake.slice(0, newLen);
-        prevSnake = snake.map(s => ({...s}));
-        if (egg) spawnBabyFromEgg();
-        generateFoods();
-        eggCooldown = 25;
-        bullet = null;
+   if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < CONFIG.fullHeight) {
+    worldDiscovered = true;
+    canvas.width = CONFIG.fullWidth * CONFIG.gridSize;
+    lastEggTime = performance.now();
+       
+    // 1. Вылупление из яйца (если есть)
+    if (egg) {
+        spawnBabyFromEgg();
     }
+    
+    // 2. Укорачиваем змейку вдвое
+    const newLen = Math.floor(snake.length / 2);
+    // Отрезаем хвост для создания детёныша (3 клетки)
+    const babyHead = snake[snake.length - 3] || snake[snake.length - 1]; // если длина < 3, берём последний сегмент
+    snake = snake.slice(0, newLen);
+    prevSnake = snake.map(s => ({...s}));
+    
+    // 3. Создаём детёныша из отрезанного хвоста (3 клетки)
+    const baby = [
+        { x: babyHead.x, y: babyHead.y },
+        { x: babyHead.x - dir.x, y: babyHead.y - dir.y },
+        { x: babyHead.x - dir.x * 2, y: babyHead.y - dir.y * 2 }
+    ];
+    babySnakes.push(baby);
+    babyPrevSnakes.push(baby.map(s => ({...s})));
+    babyDirections.push({ ...dir });
+    hadBabies = true;
+    
+    generateFoods();
+    eggCooldown = 0;   // сбрасываем старый кулдаун (теперь он временной)
+    bullet = null;
+}
 
     if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= CONFIG.fullHeight) { stopGame(); return; }
 

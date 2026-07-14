@@ -15,6 +15,7 @@ function resetGame() {
     jailCountdown = false; flashStart = 0; laserStart = 0;
     worldDiscovered = false; canvas.width = 400;
     egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
+    lastEggTime = 0;
     babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
     vultures = []; prevVultures = []; vulturesPerWave = 1; vultureMoveCounter = 0;
     generateFoods();
