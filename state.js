@@ -19,7 +19,9 @@ let applesEaten = 0;
 let poisonActive = false, lastPoisonCheck = 0;
 let pill = null;
 let sickParticles = [];
-
+let lastAppleTime = 0;           // время последнего съеденного яблока
+let isStarving = false;          // флаг голода
+let lastHungerTick = 0;          // для точного штрафа по секундам
 let poopSnake = [], prevPoopSnake = [];
 let poopSnakeActive = false, poopSnakeDir = { x: 0, y: 0 };
 let poopSnakeNextThreshold = CONFIG.poopThresholdStart;
