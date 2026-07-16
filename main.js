@@ -103,6 +103,7 @@ function updatePoison() {
 }
 
 function updateGame() {
+    if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || helpModal.classList.contains('active')) return;
     if (!gameRunning || paused) return;
     if (awaitingJailStart) return;
     if (jailCountdown) { updateCountdown(); return; }
