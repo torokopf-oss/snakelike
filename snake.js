@@ -39,6 +39,7 @@ function updatePlayer() {
     generateFoods();
     eggCooldown = 0;   // сбрасываем старый кулдаун (теперь он временной)
     bullet = null;
+    phase2Modal.classList.add('active');
 }
 
     if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= CONFIG.fullHeight) { stopGame(); return; }
