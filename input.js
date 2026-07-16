@@ -1,32 +1,33 @@
 window.addEventListener('keydown', e => {
-    // Окна
-if (e.code === 'Space') {
+    // Блокируем стандартное поведение для всех игровых клавиш
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH'].includes(e.code)) {
+        e.preventDefault();
+    }
+
+    // Обработка модальных окон (должна быть первой)
     if (startModal.classList.contains('active')) {
-        startGameFromModal();
-        return;
+        if (e.code === 'Space') {
+            startGameFromModal();
+        }
+        return; // не даём игре реагировать
     }
     if (phase2Modal.classList.contains('active')) {
-        continueFromPhase2();
+        if (e.code === 'Space') {
+            continueFromPhase2();
+        }
         return;
     }
     if (helpModal.classList.contains('active')) {
-        helpModal.classList.remove('active');
+        if (e.code === 'Space' || e.code === 'KeyH') {
+            helpModal.classList.remove('active');
+        }
         return;
     }
-}
-// Справка
-if (e.code === 'KeyH') {
-    toggleHelp();
-    return;
-}
-// Кнопка "Справка"
-helpButton.addEventListener('click', toggleHelp);
-closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
-startButton.addEventListener('click', startGameFromModal);
-phase2Button.addEventListener('click', continueFromPhase2);
-    // Блокируем стандартное поведение для всех игровых клавиш (по физическому коду)
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight'].includes(e.code)) {
-        e.preventDefault();
+
+    // Справка (вне модального окна)
+    if (e.code === 'KeyH') {
+        toggleHelp();
+        return;
     }
 
     // Пауза
@@ -38,7 +39,7 @@ phase2Button.addEventListener('click', continueFromPhase2);
         return;
     }
 
-    // Пробел (старт / тюрьма / рестарт)
+    // Пробел (обычная игра)
     if (e.code === 'Space') {
         if (awaitingJailStart) {
             awaitingJailStart = false;
@@ -53,22 +54,20 @@ phase2Button.addEventListener('click', continueFromPhase2);
     }
 
     // Яйцо / вылупление
-   if (e.code === 'KeyX') {
-    if (awaitingHatch) { hatchPlayerFromEgg(); return; }
-    if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
-    
-   const canLay = gameRunning && snake.length >= 25 && !egg
-               && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
-               && !awaitingJailStart && !jailMode;
-       
-    if (canLay) {
-        egg = { x: snake[snake.length-1].x, y: snake[snake.length-1].y };
-        lastEggTime = performance.now();
-        firstEggLaid = true;
-        eggAppleCounter = 0;
+    if (e.code === 'KeyX') {
+        if (awaitingHatch) { hatchPlayerFromEgg(); return; }
+        if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
+        const canLay = gameRunning && snake.length >= 25 && !egg
+                       && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
+                       && !awaitingJailStart && !jailMode;
+        if (canLay) {
+            egg = { x: snake[snake.length-1].x, y: snake[snake.length-1].y };
+            lastEggTime = performance.now();
+            firstEggLaid = true;
+            eggAppleCounter = 0;
+        }
+        return;
     }
-    return;
-}
 
     // Чит-режим
     if (e.code === 'BracketRight') { activateCheats(); return; }
@@ -82,7 +81,7 @@ phase2Button.addEventListener('click', continueFromPhase2);
         return;
     }
 
-    // Остальные клавиши работают только во время активной игры
+    // Остальное только при активной игре
     if (!gameRunning || awaitingHatch || paused) return;
 
     // Управление в тюрьме
@@ -114,8 +113,4 @@ phase2Button.addEventListener('click', continueFromPhase2);
         case 'ArrowLeft':  nextDir = {x:-1,y:0}; break;
         case 'ArrowRight': nextDir = {x:1,y:0}; break;
     }
-helpButton.addEventListener('click', toggleHelp);
-closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
-startButton.addEventListener('click', startGameFromModal);
-phase2Button.addEventListener('click', continueFromPhase2);
 });
