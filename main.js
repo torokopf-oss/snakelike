@@ -4,23 +4,7 @@ function resetGame() {
 startModal.classList.add('active');
 phase2Modal.classList.remove('active');
 helpModal.classList.remove('active');
-    function startGameFromModal() {
-    startModal.classList.remove('active');
-    resetGame();   // запускаем новую игру
-}
-
-function continueFromPhase2() {
-    phase2Modal.classList.remove('active');
-    // игра продолжается, мы уже в фазе 2
-}
-
-function toggleHelp() {
-    if (helpModal.classList.contains('active')) {
-        helpModal.classList.remove('active');
-    } else {
-        helpModal.classList.add('active');
-    }
-}
+    
     snake = [{ x: 10, y: 10 }]; prevSnake = [{ x: 10, y: 10 }];
     dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
     score = 0; playerPoopsEaten = 0; applesEaten = 0;
@@ -76,6 +60,28 @@ function stopGame(msg) {
     bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
     awaitingHatch = false;
 }
+    function startGameFromModal() {
+    startModal.classList.remove('active');
+    resetGame();   // запускаем новую игру
+}
+
+function continueFromPhase2() {
+    phase2Modal.classList.remove('active');
+    // игра продолжается, мы уже в фазе 2
+}
+
+function toggleHelp() {
+    if (helpModal.classList.contains('active')) {
+        helpModal.classList.remove('active');
+    } else {
+        helpModal.classList.add('active');
+    }
+}
+// Привязка кнопок модальных окон
+startButton.addEventListener('click', startGameFromModal);
+phase2Button.addEventListener('click', continueFromPhase2);
+helpButton.addEventListener('click', toggleHelp);
+closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
 
 function updateBullet() {
     if (!bullet || worldDiscovered) return;
