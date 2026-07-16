@@ -50,7 +50,10 @@ window.addEventListener('keydown', e => {
 
     // Санация
     if (e.code === 'KeyS' && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) {
-        activateSanitation();
+        if (sanitationCharges > 0) {
+            activateSanitation();
+            sanitationCharges--;
+        }
         return;
     }
 
