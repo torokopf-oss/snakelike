@@ -9,4 +9,6 @@ const CONFIG = {
     countdownSeconds: 3,
     vultureSpeedDivider: 2, vultureThreshold: 5,
     eggCooldownMs: 35000
+    hungerTime: 15000,               // 15 секунд до начала голода
+    hungerPenaltyPerSecond: 100      // минус 100 очков в секунду
 };
