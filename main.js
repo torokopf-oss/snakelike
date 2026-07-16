@@ -208,7 +208,7 @@ function gameLoop(now) {
     drawGame(t, now);
     animationFrameId = requestAnimationFrame(gameLoop);
 }
-
+startModal.classList.add('active');
 // Старт
 snake = [{x:10,y:10}]; prevSnake = [{x:10,y:10}];
 generateFoods();
