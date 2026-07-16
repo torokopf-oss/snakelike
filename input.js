@@ -1,4 +1,29 @@
 window.addEventListener('keydown', e => {
+    // Окна
+if (e.code === 'Space') {
+    if (startModal.classList.contains('active')) {
+        startGameFromModal();
+        return;
+    }
+    if (phase2Modal.classList.contains('active')) {
+        continueFromPhase2();
+        return;
+    }
+    if (helpModal.classList.contains('active')) {
+        helpModal.classList.remove('active');
+        return;
+    }
+}
+// Справка
+if (e.code === 'KeyH') {
+    toggleHelp();
+    return;
+}
+// Кнопка "Справка"
+helpButton.addEventListener('click', toggleHelp);
+closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
+startButton.addEventListener('click', startGameFromModal);
+phase2Button.addEventListener('click', continueFromPhase2);
     // Блокируем стандартное поведение для всех игровых клавиш (по физическому коду)
     if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight'].includes(e.code)) {
         e.preventDefault();
