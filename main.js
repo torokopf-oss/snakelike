@@ -19,6 +19,9 @@ function resetGame() {
     worldDiscovered = false; canvas.width = 400;
     egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
     lastEggTime = 0;
+    lastAppleTime = performance.now();
+    isStarving = false;
+    lastHungerTick = 0;
     babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
     vultures = []; prevVultures = []; vulturesPerWave = 1; vultureMoveCounter = 0;
     generateFoods();
@@ -115,6 +118,26 @@ function updateGame() {
     updatePlayer();
     if (!worldDiscovered) updateBullet();
     updatePoison();
+    // Голод
+if (gameRunning && !awaitingHatch && !jailMode) {
+    if (performance.now() - lastAppleTime >= CONFIG.hungerTime) {
+        if (!isStarving) {
+            isStarving = true;
+            lastHungerTick = performance.now();
+        } else {
+            const elapsed = performance.now() - lastHungerTick;
+            if (elapsed >= 1000) {
+                const seconds = Math.floor(elapsed / 1000);
+                score = Math.max(0, score - CONFIG.hungerPenaltyPerSecond * seconds);
+                scoreSpan.textContent = score;
+                lastHungerTick += seconds * 1000;
+                if (score <= 0) stopGame('Смерть от голода');
+            }
+        }
+    } else {
+        isStarving = false;
+    }
+}
     updateBabies();
 // Начисление зарядов санации
 if (!sanitationMilestoneReached && score >= 1000) {
