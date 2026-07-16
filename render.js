@@ -232,11 +232,7 @@ if (worldDiscovered) {
         }
         ctx.restore();
     }
-// Заряды санации
-ctx.fillStyle = 'white';
-ctx.font = '14px "Segoe UI"';
-ctx.textAlign = 'right';
-ctx.fillText(`Санация: ${sanitationCharges}`, canvas.width - 10, 20);
+
     // Сообщения
     if (paused && gameRunning) {
         ctx.fillStyle = 'rgba(0,0,0,0.5)'; ctx.fillRect(0,0,canvas.width,canvas.height);
