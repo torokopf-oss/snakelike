@@ -138,10 +138,7 @@ function updateGame() {
         sanitationMilestoneReached = true;
         nextSanitationScore = 1500;
     }
-    if (sanitationMilestoneReached && score >= nextSanitationScore) {
-        sanitationCharges++;
-        nextSanitationScore += 500;
-    }
+  
 // Обновление таймера голода
 const hungerRemaining = Math.max(0, Math.ceil((CONFIG.hungerTime - (performance.now() - lastAppleTime)) / 1000));
 hungerTimerSpan.textContent = hungerRemaining;
@@ -215,8 +212,3 @@ function gameLoop(now) {
     animationFrameId = requestAnimationFrame(gameLoop);
 }
 startModal.classList.add('active');
-// Старт
-snake = [{x:10,y:10}]; prevSnake = [{x:10,y:10}];
-generateFoods();
-gameRunning = false; gameOverFlag = false;
-animationFrameId = requestAnimationFrame(ts => { drawGame(0, ts); animationFrameId = null; });
