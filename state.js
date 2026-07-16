@@ -5,7 +5,7 @@ const scoreSpan = document.getElementById('scoreDisplay');
 const poopEatenSpan = document.getElementById('poopEatenDisplay');
 const highScoreSpan = document.getElementById('highScoreDisplay');
 const gameOverDiv = document.getElementById('gameOverText');
-
+const hungerTimerSpan = document.getElementById('hungerTimerDisplay');
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
 let dir = { x: 0, y: 0 }, nextDir = { x: 0, y: 0 };
