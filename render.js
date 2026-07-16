@@ -106,11 +106,6 @@ function drawGame(t, now) {
         ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
-ctx.fillStyle = 'white';
-ctx.font = '14px "Segoe UI"';
-ctx.textAlign = 'right';
-ctx.fillText(`Санация: ${sanitationCharges}`, canvas.width - 10, canvas.height - 10);
-    
     // Стена
     if (!worldDiscovered && snake.length >= 30) {
         const wallX = CONFIG.viewWidth * gs;
@@ -204,7 +199,14 @@ ctx.fillText(`Санация: ${sanitationCharges}`, canvas.width - 10, canvas.h
         const alpha = Math.min(1, p.life/300);
         ctx.fillStyle = `rgba(46,204,113,${alpha})`; ctx.beginPath(); ctx.arc(p.x, p.y, 2+(1-alpha)*3, 0, Math.PI*2); ctx.fill();
     }
-
+    
+// Счётчик санации (только во второй фазе)
+if (worldDiscovered) {
+    ctx.fillStyle = 'rgba(255,255,255,0.9)';
+    ctx.font = 'bold 14px "Segoe UI"';
+    ctx.textAlign = 'right';
+    ctx.fillText(`Санация: ${sanitationCharges}`, canvas.width - 15, 25);
+}
     // Тюрьма / Отсчёт
     if (jailMode || jailCountdown) {
         ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
