@@ -114,4 +114,8 @@ phase2Button.addEventListener('click', continueFromPhase2);
         case 'ArrowLeft':  nextDir = {x:-1,y:0}; break;
         case 'ArrowRight': nextDir = {x:1,y:0}; break;
     }
+helpButton.addEventListener('click', toggleHelp);
+closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
+startButton.addEventListener('click', startGameFromModal);
+phase2Button.addEventListener('click', continueFromPhase2);
 });
