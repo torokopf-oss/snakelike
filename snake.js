@@ -55,6 +55,8 @@ function updatePlayer() {
     for (let i = foods.length - 1; i >= 0; i--) {
         if (newHead.x === foods[i].x && newHead.y === foods[i].y) {
             foods.splice(i, 1);
+            lastAppleTime = performance.now();
+            isStarving = false;
             ateApple = true;
             applesEaten++;
             score += 10 + snake.length; 
