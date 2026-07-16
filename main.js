@@ -1,7 +1,6 @@
 function resetGame() {
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     // Показываем стартовое окно
-startModal.classList.add('active');
 phase2Modal.classList.remove('active');
 helpModal.classList.remove('active');
     
@@ -167,16 +166,7 @@ if (gameRunning && !awaitingHatch && !jailMode) {
     }
 }
     updateBabies();
-// Начисление зарядов санации
-if (!sanitationMilestoneReached && score >= 1000) {
-    sanitationCharges += 2;
-    sanitationMilestoneReached = true;
-    nextSanitationScore = 1500;   // следующий порог после первых 1000
-}
-if (sanitationMilestoneReached && score >= nextSanitationScore) {
-    sanitationCharges++;
-    nextSanitationScore += 500;   // каждые 500 очков
-}
+    
     vultureMoveCounter++;
     if (vultureMoveCounter >= CONFIG.vultureSpeedDivider) { updateVultures(); vultureMoveCounter = 0; }
 
