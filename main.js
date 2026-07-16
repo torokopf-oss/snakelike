@@ -20,6 +20,7 @@ function resetGame() {
     egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
     lastEggTime = 0;
     lastAppleTime = performance.now();
+    hungerTimerSpan.textContent = '15';
     isStarving = false;
     lastHungerTick = 0;
     babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
@@ -113,7 +114,9 @@ function updateGame() {
         sanitationCharges++;
         nextSanitationScore += 500;
     }
-
+// Обновление таймера голода
+const hungerRemaining = Math.max(0, Math.ceil((CONFIG.hungerTime - (performance.now() - lastAppleTime)) / 1000));
+hungerTimerSpan.textContent = hungerRemaining;
     prevVultures = vultures.map(v => ({...v}));
     updatePlayer();
     if (!worldDiscovered) updateBullet();
