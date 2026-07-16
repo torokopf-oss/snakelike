@@ -143,7 +143,15 @@ function drawGame(t, now) {
         ctx.beginPath(); ctx.ellipse(ex+gs/2, ey+gs/2, gs/2-2, gs/2-4, 0, 0, Math.PI*2); ctx.fill();
     }
     if (poopSnakeActive) drawSnake(poopSnake, prevPoopSnake, '#A0522D', '#6B3A2A', 0, 0, gs, t);
-
+    //ГОЛОД
+    if (isStarving && worldDiscovered) {
+    ctx.fillStyle = 'rgba(255,0,0,0.15)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'white';
+    ctx.font = 'bold 18px "Segoe UI"';
+    ctx.textAlign = 'center';
+    ctx.fillText('ГОЛОД! -100/сек', canvas.width/2, canvas.height - 15);
+}
     // Лазерный луч
     if (laserStart && now - laserStart < LASER_DURATION) {
         const head = snake[0];
