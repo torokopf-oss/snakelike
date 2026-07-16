@@ -5,6 +5,15 @@ const scoreSpan = document.getElementById('scoreDisplay');
 const poopEatenSpan = document.getElementById('poopEatenDisplay');
 const highScoreSpan = document.getElementById('highScoreDisplay');
 const gameOverDiv = document.getElementById('gameOverText');
+// Модальные окна
+const startModal = document.getElementById('startModal');
+const phase2Modal = document.getElementById('phase2Modal');
+const helpModal = document.getElementById('helpModal');
+const startButton = document.getElementById('startButton');
+const phase2Button = document.getElementById('phase2Button');
+const helpButton = document.getElementById('helpButton');
+const closeHelpButton = document.getElementById('closeHelpButton');
+
 const hungerTimerSpan = document.getElementById('hungerTimerDisplay');
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
