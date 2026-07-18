@@ -24,6 +24,8 @@ function resetGame() {
     egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
     lastEggTime = 0;
     lastAppleTime = performance.now();
+    hungerBar.style.height = '100%';
+    hungerBar.classList.remove('starving');
     hungerTimerSpan.textContent = '15';
     isStarving = false;
     lastHungerTick = 0;
@@ -141,6 +143,14 @@ function updateGame() {
 // Обновление таймера голода
 const hungerRemaining = Math.max(0, Math.ceil((CONFIG.hungerTime - (performance.now() - lastAppleTime)) / 1000));
 hungerTimerSpan.textContent = hungerRemaining;
+    // Обновление полоски голода
+const hungerFraction = hungerRemaining / (CONFIG.hungerTime / 1000);
+hungerBar.style.height = (hungerFraction * 100) + '%';
+if (isStarving) {
+    hungerBar.classList.add('starving');
+} else {
+    hungerBar.classList.remove('starving');
+}
     prevVultures = vultures.map(v => ({...v}));
     updatePlayer();
     if (!worldDiscovered) updateBullet();
