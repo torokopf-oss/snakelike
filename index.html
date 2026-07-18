@@ -7,73 +7,90 @@
     <style>
         body {
             margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
             background: #1a1a2e;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
-            overflow: hidden;
-            position: relative;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-      .game-container {
-    display: flex;
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 10px;
-}
 
-.side-panel {
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    gap: 8px;
-    color: white;
-    font-size: 16px;
-    width: 120px;
-    text-align: left;
-}
-
-.info-item {
-    white-space: nowrap;
-}
-
-canvas {
-    border: 2px solid #e94560;
-    background: #16213e;
-    box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
-}
-
-#hungerBarContainer {
-    width: 14px;
-    height: 400px;
-    background: #0f0f1a;
-    border: 1px solid #e94560;
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-#hungerBar {
-    width: 100%;
-    height: 100%;
-    background: #f1c40f;
-    transition: height 0.5s, background 0.5s;
-}
-#hungerBar.starving {
-    background: #e74c3c;
-}
-        .info {
-            color: white; margin-bottom: 10px; font-size: 18px;
-            display: flex; justify-content: space-between;
-            width: 400px; margin-left: auto; margin-right: auto;
+        .game-container {
+            display: flex;
+            flex-direction: column;
             align-items: center;
         }
-        .info > span {
-            display: inline-block;
-            width: 100px; text-align: center; white-space: nowrap;
+
+        .game-area {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 10px;
         }
-        .game-over-text {
-            color: #e94560; font-size: 28px; margin-top: 10px; height: 34px;
+
+        /* Левая панель с инфой */
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 8px;
+            color: white;
+            font-size: 16px;
+            width: 120px;
+            text-align: left;
+        }
+
+        .info-item {
+            white-space: nowrap;
+        }
+
+        canvas {
+            border: 2px solid #e94560;
+            background: #16213e;
+            box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+        }
+
+        /* Полоска голода справа */
+        #hungerBarContainer {
+            width: 14px;
+            height: 400px;             /* как холст */
+            background: #0f0f1a;
+            border: 1px solid #e94560;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        #hungerBar {
+            width: 100%;
+            height: 100%;
+            background: #f1c40f;
+            transition: height 0.5s, background 0.5s;
+        }
+        #hungerBar.starving {
+            background: #e74c3c;
+        }
+
+        /* Блок под холстом */
+        .bottom-info {
+            text-align: center;
+            margin-top: 10px;
+            color: #e94560;
+            font-size: 28px;
+            min-height: 40px;
+        }
+
+        .help-button {
+            margin-top: 5px;
+            background: none;
+            border: 1px solid #aaa;
+            color: #aaa;
+            padding: 4px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
         }
 
         /* Модальные окна */
@@ -111,52 +128,41 @@ canvas {
             border-radius: 8px;
             cursor: pointer;
         }
-
-        .help-button {
-            margin-top: 10px;
-            background: none;
-            border: 1px solid #aaa;
-            color: #aaa;
-            padding: 4px 12px;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
     </style>
 </head>
 <body>
 <div class="game-container" id="gameContainer">
-    <div class="side-panel">
-        <div class="info-item">🍎 Очки: <span id="scoreDisplay">0</span></div>
-        <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
-        <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
-        <div class="info-item">⏱️ <span id="hungerTimerDisplay">15</span></div>
+    <div class="game-area">
+        <div class="side-panel">
+            <div class="info-item">🍎 Очки: <span id="scoreDisplay">0</span></div>
+            <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
+            <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
+            <div class="info-item">⏱️ <span id="hungerTimerDisplay">15</span></div>
+        </div>
+
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+        <div id="hungerBarContainer">
+            <div id="hungerBar"></div>
+        </div>
     </div>
 
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-
-    <div id="hungerBarContainer">
-        <div id="hungerBar"></div>
+    <div class="bottom-info">
+        <div id="gameOverText"></div>
+        <button class="help-button" id="helpButton">Справка</button>
     </div>
-    </div>
-    <div class="game-over-text" id="gameOverText"></div>
-    <button class="help-button" id="helpButton">Справка</button>
 
-    <!-- Модальное окно старта -->
+    <!-- Модальные окна -->
     <div class="modal active" id="startModal">
         <h2>Змейка</h2>
         <p>Питаться и расти, не умереть.</p>
         <button id="startButton">Начать (пробел)</button>
     </div>
-
-    <!-- Модальное окно второй фазы -->
     <div class="modal" id="phase2Modal">
         <h2>Выводок</h2>
         <p>Питаться и размножаться, защищать потомство.</p>
         <button id="phase2Button">Продолжить (пробел)</button>
     </div>
-
-    <!-- Модальное окно справки -->
     <div class="modal" id="helpModal">
         <h2>Управление</h2>
         <p>Движение: стрелки<br>
