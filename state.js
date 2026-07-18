@@ -14,7 +14,10 @@ const startButton = document.getElementById('startButton');
 const phase2Button = document.getElementById('phase2Button');
 const helpButton = document.getElementById('helpButton');
 const closeHelpButton = document.getElementById('closeHelpButton');
-
+const gameTimeSpan = document.getElementById('gameTimeDisplay');
+let gameTime = 0;                // прошедшее время активной игры (мс)
+let lastTimeUpdate = 0;          // момент последнего обновления счётчика времени
+const gameTimeDisplay = null;    // будет назначен позже
 const hungerTimerSpan = document.getElementById('hungerTimerDisplay');
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
