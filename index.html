@@ -15,11 +15,17 @@
             overflow: hidden;
             position: relative;
         }
-        .game-container { text-align: center; position: relative; }
+       .game-container {
+    text-align: center;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+}
         canvas {
             border: 2px solid #e94560;
             background: #16213e;
-            display: block; margin: 0 auto;
+            display: block;
             box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
             max-width: 100%;
         }
