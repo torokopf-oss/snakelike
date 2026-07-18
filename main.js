@@ -1,9 +1,9 @@
 function resetGame() {
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     // Показываем стартовое окно
-phase2Modal.classList.remove('active');
-helpModal.classList.remove('active');
-    
+    phase2Modal.classList.remove('active');
+    helpModal.classList.remove('active');
+    pauseStartTime = 0;
     snake = [{ x: 10, y: 10 }]; prevSnake = [{ x: 10, y: 10 }];
     dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
     score = 0; playerPoopsEaten = 0; applesEaten = 0;
