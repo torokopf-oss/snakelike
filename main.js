@@ -2,6 +2,8 @@ function resetGame() {
     gameTime = 0;
 lastTimeUpdate = performance.now();
 gameTimeSpan.textContent = '00:00';
+    hungerBar.style.height = '100%';
+hungerBar.classList.remove('starving');
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     // Показываем стартовое окно
     phase2Modal.classList.remove('active');
@@ -160,7 +162,7 @@ const hungerRemaining = Math.max(0, Math.ceil((CONFIG.hungerTime - (performance.
 hungerTimerSpan.textContent = hungerRemaining;
     // Обновление полоски голода
 const hungerFraction = hungerRemaining / (CONFIG.hungerTime / 1000);
-hungerBar.style.height = (hungerFraction * 100) + '%';
+hungerBar.style.height = (hungerFraction * 100) + '%';   // заполнено сверху
 if (isStarving) {
     hungerBar.classList.add('starving');
 } else {
