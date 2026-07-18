@@ -15,41 +15,50 @@
             overflow: hidden;
             position: relative;
         }
-       .game-container {
-    text-align: center;
+      .game-container {
     display: flex;
     flex-direction: row;
     align-items: flex-start;
     justify-content: center;
+    gap: 10px;
 }
-        canvas {
-            border: 2px solid #e94560;
-            background: #16213e;
-            display: block;
-            box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
-            max-width: 100%;
-        }
-        #hungerBarContainer {
+
+.side-panel {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    gap: 8px;
+    color: white;
+    font-size: 16px;
+    width: 120px;
+    text-align: left;
+}
+
+.info-item {
+    white-space: nowrap;
+}
+
+canvas {
+    border: 2px solid #e94560;
+    background: #16213e;
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+}
+
+#hungerBarContainer {
     width: 14px;
-    height: 400px;               /* как холст */
+    height: 400px;
     background: #0f0f1a;
     border: 1px solid #e94560;
-    display: inline-block;
-    vertical-align: top;
-    margin-left: 5px;
-    position: relative;
     border-radius: 4px;
     overflow: hidden;
 }
+
 #hungerBar {
-    position: absolute;
-    bottom: 0;
     width: 100%;
-    height: 100%;               /* изначально полный */
-    background: #f1c40f;        /* жёлтый */
+    height: 100%;
+    background: #f1c40f;
     transition: height 0.5s, background 0.5s;
 }
-/* когда голод, полоска красная – добавим класс через JS */
 #hungerBar.starving {
     background: #e74c3c;
 }
@@ -117,15 +126,18 @@
 </head>
 <body>
 <div class="game-container" id="gameContainer">
-    <div class="info">
-        <span>🍎 Очки: <span id="scoreDisplay">0</span></span>
-        <span>💩 <span id="poopEatenDisplay">0/5</span></span>
-        <span>🏆 Рекорд: <span id="highScoreDisplay">0</span></span>
-        <span>⏱️ <span id="hungerTimerDisplay">15</span></span>
+    <div class="side-panel">
+        <div class="info-item">🍎 Очки: <span id="scoreDisplay">0</span></div>
+        <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
+        <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
+        <div class="info-item">⏱️ <span id="hungerTimerDisplay">15</span></div>
     </div>
-   <canvas id="gameCanvas" width="400" height="400"></canvas>
+
+    <canvas id="gameCanvas" width="400" height="400"></canvas>
+
     <div id="hungerBarContainer">
-    <div id="hungerBar"></div>
+        <div id="hungerBar"></div>
+    </div>
     </div>
     <div class="game-over-text" id="gameOverText"></div>
     <button class="help-button" id="helpButton">Справка</button>
