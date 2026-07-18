@@ -1,4 +1,7 @@
 function resetGame() {
+    gameTime = 0;
+lastTimeUpdate = performance.now();
+gameTimeSpan.textContent = '00:00';
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     // Показываем стартовое окно
     phase2Modal.classList.remove('active');
@@ -127,6 +130,18 @@ function updatePoison() {
 }
 
 function updateGame() {
+    // Обновление игрового времени (если игра активна)
+if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch &&
+    !startModal.classList.contains('active') && !phase2Modal.classList.contains('active') && !helpModal.classList.contains('active')) {
+    gameTime += performance.now() - lastTimeUpdate;
+    lastTimeUpdate = performance.now();
+    const totalSec = Math.floor(gameTime / 1000);
+    const min = Math.floor(totalSec / 60);
+    const sec = totalSec % 60;
+    gameTimeSpan.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+} else {
+    lastTimeUpdate = performance.now();   // чтобы не накапливать отставание
+}
     if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || helpModal.classList.contains('active')) return;
     if (!gameRunning || paused) return;
     if (awaitingJailStart) return;
