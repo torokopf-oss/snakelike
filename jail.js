@@ -13,6 +13,7 @@ function updateJail() {
     jailSnake.unshift(newHead); jailSnake.pop();
     if (performance.now() - jailStartTime >= CONFIG.jailDuration) {
         jailMode = false;
+        lastAppleTime = performance.now();   // сброс таймера голода
         snake = jailSnake.map(s => ({ x: s.x + 7, y: s.y + 8 }));
         for (const seg of snake) {
             const fi = foods.findIndex(f => f.x === seg.x && f.y === seg.y);
