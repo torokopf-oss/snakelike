@@ -52,28 +52,29 @@
             box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
         }
 
-        #hungerBarContainer {
-            width: 14px;
-            height: 400px;
-            background: #0f0f1a;
-            border: 1px solid #e94560;
-            border-radius: 4px;
-            overflow: hidden;
-            flex-shrink: 0;
-        }
+    #hungerBarContainer {
+    width: 14px;
+    height: 400px;               /* строго как холст */
+    background: #0f0f1a;
+    border: 1px solid #e94560;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;          /* для абсолютного позиционирования внутри */
+}
 
-      #hungerBar {
+#hungerBar {
     position: absolute;
-    top: 0;                /* теперь отсчёт сверху */
+    top: 0;                      /* начинается от верхнего края */
+    left: 0;
     width: 100%;
-    height: 0;             /* начнём с пустого */
+    height: 100%;                /* изначально полный */
     background: #f1c40f;
     transition: height 0.5s, background 0.5s;
 }
-
-        #hungerBar.starving {
-            background: #e74c3c;
-        }
+#hungerBar.starving {
+    background: #e74c3c;
+}
 
        .help-button {
     margin-top: 12px;          /* отступ от таймера */
