@@ -62,12 +62,14 @@
             flex-shrink: 0;
         }
 
-        #hungerBar {
-            width: 100%;
-            height: 100%;
-            background: #f1c40f;
-            transition: height 0.5s, background 0.5s;
-        }
+      #hungerBar {
+    position: absolute;
+    top: 0;                /* теперь отсчёт сверху */
+    width: 100%;
+    height: 0;             /* начнём с пустого */
+    background: #f1c40f;
+    transition: height 0.5s, background 0.5s;
+}
 
         #hungerBar.starving {
             background: #e74c3c;
