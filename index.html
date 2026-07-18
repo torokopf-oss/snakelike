@@ -31,7 +31,6 @@
             gap: 10px;
         }
 
-        /* Левая панель с инфой */
         .side-panel {
             display: flex;
             flex-direction: column;
@@ -53,49 +52,39 @@
             box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
         }
 
-        /* Полоска голода справа */
         #hungerBarContainer {
             width: 14px;
-            height: 400px;             /* как холст */
+            height: 400px;
             background: #0f0f1a;
             border: 1px solid #e94560;
             border-radius: 4px;
             overflow: hidden;
             flex-shrink: 0;
         }
+
         #hungerBar {
             width: 100%;
             height: 100%;
             background: #f1c40f;
             transition: height 0.5s, background 0.5s;
         }
+
         #hungerBar.starving {
             background: #e74c3c;
         }
 
-        /* Блок под холстом */
-       .bottom-info {
-    text-align: center;
-    margin-top: 10px;
-    color: #e94560;
-    font-size: 28px;
-    min-height: 60px;          /* достаточно места для любого сообщения */
-    line-height: 1.2;
-}
+        .help-button {
+            display: block;
+            margin: 10px auto 0 auto;
+            background: none;
+            border: 1px solid #aaa;
+            color: #aaa;
+            padding: 4px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
 
-.help-button {
-    display: block;
-    margin: 8px auto 0 auto;   /* кнопка по центру, не привязана к .bottom-info */
-    background: none;
-    border: 1px solid #aaa;
-    color: #aaa;
-    padding: 4px 12px;
-    font-size: 14px;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-        /* Модальные окна */
         .modal {
             display: none;
             position: absolute;
@@ -109,18 +98,22 @@
             color: white;
             font-family: 'Segoe UI', sans-serif;
         }
+
         .modal.active {
             display: flex;
         }
+
         .modal h2 {
             font-size: 36px;
             margin-bottom: 10px;
         }
+
         .modal p {
             font-size: 18px;
             margin-bottom: 20px;
             text-align: center;
         }
+
         .modal button {
             padding: 10px 30px;
             font-size: 20px;
@@ -141,20 +134,14 @@
             <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
             <div class="info-item">⏱️ <span id="hungerTimerDisplay">15</span></div>
         </div>
-
         <canvas id="gameCanvas" width="400" height="400"></canvas>
-
         <div id="hungerBarContainer">
             <div id="hungerBar"></div>
         </div>
     </div>
+    <div id="gameOverText" style="display: none;"></div>
+    <button class="help-button" id="helpButton">Справка</button>
 
- <div class="bottom-info">
-    <div id="gameOverText"></div>
-</div>
-<button class="help-button" id="helpButton">Справка</button>
-
-    <!-- Модальные окна -->
     <div class="modal active" id="startModal">
         <h2>Змейка</h2>
         <p>Питаться и расти, не умереть.</p>
@@ -176,7 +163,6 @@
     </div>
 </div>
 
-<!-- Загрузка модулей -->
 <script src="config.js"></script>
 <script src="state.js"></script>
 <script src="render.js"></script>
