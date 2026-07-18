@@ -73,17 +73,18 @@
             background: #e74c3c;
         }
 
-        .help-button {
-            display: block;
-            margin: 10px auto 0 auto;
-            background: none;
-            border: 1px solid #aaa;
-            color: #aaa;
-            padding: 4px 12px;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+       .help-button {
+    margin-top: 12px;          /* отступ от таймера */
+    background: none;
+    border: 1px solid #aaa;
+    color: #aaa;
+    padding: 4px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;               /* на всю ширину панели */
+    text-align: center;
+}
 
         .modal {
             display: none;
@@ -128,19 +129,19 @@
 <body>
 <div class="game-container" id="gameContainer">
     <div class="game-area">
-        <div class="side-panel">
-            <div class="info-item">🍎 Очки: <span id="scoreDisplay">0</span></div>
-            <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
-            <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
-            <div class="info-item">⏱️ <span id="hungerTimerDisplay">15</span></div>
-        </div>
+    <div class="side-panel">
+    <div class="info-item">🍎 Очки: <span id="scoreDisplay">0</span></div>
+    <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
+    <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
+    <div class="info-item">⏱️ <span id="hungerTimerDisplay">15</span></div>
+    <button class="help-button" id="helpButton">Справка</button>
+</div>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
         <div id="hungerBarContainer">
             <div id="hungerBar"></div>
         </div>
     </div>
     <div id="gameOverText" style="display: none;"></div>
-    <button class="help-button" id="helpButton">Справка</button>
 
     <div class="modal active" id="startModal">
         <h2>Змейка</h2>
