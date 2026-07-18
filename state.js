@@ -21,6 +21,7 @@ let dir = { x: 0, y: 0 }, nextDir = { x: 0, y: 0 };
 let score = 0, highScore = 0;
 let gameRunning = false, gameOverFlag = false;
 let paused = false;
+let pauseStartTime = 0;
 let playerPoopsEaten = 0;
 let foods = [], prevFoods = [];
 let poops = [];
