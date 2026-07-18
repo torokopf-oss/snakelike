@@ -74,24 +74,26 @@
         }
 
         /* Блок под холстом */
-        .bottom-info {
-            text-align: center;
-            margin-top: 10px;
-            color: #e94560;
-            font-size: 28px;
-            min-height: 40px;
-        }
+       .bottom-info {
+    text-align: center;
+    margin-top: 10px;
+    color: #e94560;
+    font-size: 28px;
+    min-height: 60px;          /* достаточно места для любого сообщения */
+    line-height: 1.2;
+}
 
-        .help-button {
-            margin-top: 5px;
-            background: none;
-            border: 1px solid #aaa;
-            color: #aaa;
-            padding: 4px 12px;
-            font-size: 14px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
+.help-button {
+    display: block;
+    margin: 8px auto 0 auto;   /* кнопка по центру, не привязана к .bottom-info */
+    background: none;
+    border: 1px solid #aaa;
+    color: #aaa;
+    padding: 4px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+}
 
         /* Модальные окна */
         .modal {
@@ -147,10 +149,10 @@
         </div>
     </div>
 
-    <div class="bottom-info">
-        <div id="gameOverText"></div>
-        <button class="help-button" id="helpButton">Справка</button>
-    </div>
+ <div class="bottom-info">
+    <div id="gameOverText"></div>
+</div>
+<button class="help-button" id="helpButton">Справка</button>
 
     <!-- Модальные окна -->
     <div class="modal active" id="startModal">
