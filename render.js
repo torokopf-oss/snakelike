@@ -254,7 +254,7 @@ if (worldDiscovered) {
     }
     if (gameOverFlag) {
         ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = 'white'; ctx.font = '18px "Segoe UI"'; ctx.textAlign = 'center';
+        ctx.fillStyle = 'white'; ctx.font = '16px "Segoe UI"'; ctx.textAlign = 'center';
         ctx.fillText(gameOverDiv.textContent, canvas.width/2, canvas.height/2);
     }
     if (poopSnakeMessageText && now < poopSnakeMessageUntil) {
