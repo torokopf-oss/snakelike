@@ -1,7 +1,7 @@
 function resetGame() {
     gameTime = 0;
 lastTimeUpdate = performance.now();
-gameTimeSpan.textContent = '00:00';
+gameTimeSpan.textContent = '0';
     hungerBar.style.height = '100%';
 hungerBar.classList.remove('starving');
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -29,9 +29,6 @@ hungerBar.classList.remove('starving');
     egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
     lastEggTime = 0;
     lastAppleTime = performance.now();
-    hungerBar.style.height = '100%';
-    hungerBar.classList.remove('starving');
-    hungerTimerSpan.textContent = '15';
     isStarving = false;
     lastHungerTick = 0;
     babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
@@ -138,12 +135,11 @@ if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch 
     gameTime += performance.now() - lastTimeUpdate;
     lastTimeUpdate = performance.now();
     const totalSec = Math.floor(gameTime / 1000);
-    const min = Math.floor(totalSec / 60);
-    const sec = totalSec % 60;
-    gameTimeSpan.textContent = `${String(min).padStart(2, '0')}:${String(sec).padStart(2, '0')}`;
+    gameTimeSpan.textContent = totalSec;   // просто количество секунд
 } else {
-    lastTimeUpdate = performance.now();   // чтобы не накапливать отставание
+    lastTimeUpdate = performance.now();
 }
+    
     if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || helpModal.classList.contains('active')) return;
     if (!gameRunning || paused) return;
     if (awaitingJailStart) return;
@@ -158,8 +154,11 @@ if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch 
     }
   
     // Обновление полоски голода
-const hungerFraction = hungerRemaining / (CONFIG.hungerTime / 1000);
-hungerBar.style.height = (hungerFraction * 100) + '%';   // заполнено сверху
+const remaining = Math.max(0, CONFIG.hungerTime - (performance.now() - lastAppleTime));
+const hungerFraction = remaining / CONFIG.hungerTime;
+hungerBar.style.height = (hungerFraction * 100) + '%';
+    
+    hungerBar.style.height = (hungerFraction * 100) + '%';   // заполнено сверху
 if (isStarving) {
     hungerBar.classList.add('starving');
 } else {
