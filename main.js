@@ -1,9 +1,10 @@
 function resetGame() {
     gameTime = 0;
-lastTimeUpdate = performance.now();
-gameTimeSpan.textContent = '0';
-    hungerBar.style.height = '100%';
-hungerBar.classList.remove('starving');
+    lastTimeUpdate = performance.now();
+    gameTimeSpan.textContent = '0';
+    hungerBarOverlay.style.height = '0%';
+    hungerBarBg.classList.remove('starving');
+   
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     // Показываем стартовое окно
     phase2Modal.classList.remove('active');
@@ -153,17 +154,17 @@ if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch 
         nextSanitationScore = 1500;
     }
   
-    // Обновление полоски голода
+// Обновление полоски голода (чернеет сверху вниз)
 const remaining = Math.max(0, CONFIG.hungerTime - (performance.now() - lastAppleTime));
-const hungerFraction = remaining / CONFIG.hungerTime;
-hungerBar.style.height = (hungerFraction * 100) + '%';
-    
-    hungerBar.style.height = (hungerFraction * 100) + '%';   // заполнено сверху
+const hungerFraction = remaining / CONFIG.hungerTime;   // 1 = полный, 0 = пустой
+hungerBarOverlay.style.height = ((1 - hungerFraction) * 100) + '%';  // чёрный растёт сверху
+
 if (isStarving) {
-    hungerBar.classList.add('starving');
+    hungerBarBg.classList.add('starving');
 } else {
-    hungerBar.classList.remove('starving');
+    hungerBarBg.classList.remove('starving');
 }
+    
     prevVultures = vultures.map(v => ({...v}));
     updatePlayer();
     if (!worldDiscovered) updateBullet();
