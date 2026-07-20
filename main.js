@@ -40,16 +40,18 @@ function resetGame() {
 }
 
 function stopGame(msg) {
-    // Вычисляем бонус за время
     const timeSec = Math.floor(gameTime / 1000);
     const timeBonus = timeSec * 10;
     const finalScore = score + timeBonus;
-    const scoreText = `Счёт: ${finalScore} (${score} + ${timeSec}×10)`;
+
+    // Формируем сообщение: основная причина + счёт (если игра окончена)
+    const reason = msg || 'Игра окончена!';
+    const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec}×10)`;
 
     if (msg === 'Потомство уничтожено') {
         gameRunning = false; gameOverFlag = true;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        gameOverDiv.textContent = `Потомство уничтожено. ${scoreText}`;
+        gameOverDiv.innerText = `${reason}\n${scoreLine}`;
         if (score > highScore) { highScore = score; highScoreSpan.textContent = highScore; localStorage.setItem('snakeHighScore', highScore); }
         bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
         awaitingHatch = false;
@@ -57,15 +59,16 @@ function stopGame(msg) {
     }
     if (egg && !awaitingHatch && gameRunning) {
         awaitingHatch = true;
-        gameOverDiv.textContent = `Нажмите X, чтобы вылупиться. ${scoreText}`;
+        gameOverDiv.innerText = 'Нажмите X, чтобы вылупиться';   // без счёта, игра приостановлена
         snake = []; prevSnake = []; dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
         gameRunning = false;
         bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
         return;
     }
+    // Обычная смерть
     gameRunning = false; gameOverFlag = true;
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    gameOverDiv.textContent = msg ? `${msg}. ${scoreText}` : `Игра окончена! ${scoreText}`;
+    gameOverDiv.innerText = `${reason}\n${scoreLine}`;
     if (score > highScore) { highScore = score; highScoreSpan.textContent = highScore; localStorage.setItem('snakeHighScore', highScore); }
     bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
     awaitingHatch = false;
