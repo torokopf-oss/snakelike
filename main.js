@@ -43,7 +43,8 @@ function stopGame(msg) {
     if (msg === 'Потомство уничтожено') {
         gameRunning = false; gameOverFlag = true;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        gameOverDiv.textContent = msg;
+       const finalScore = score + Math.floor(gameTime / 1000) * 10;
+gameOverDiv.textContent = msg || `Игра окончена! Счёт: ${finalScore} (${score} + ${Math.floor(gameTime / 1000)}×10). Пробел — рестарт`;
         if (score > highScore) { highScore = score; highScoreSpan.textContent = highScore; localStorage.setItem('snakeHighScore', highScore); }
         bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
         awaitingHatch = false;
