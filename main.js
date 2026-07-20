@@ -157,9 +157,6 @@ if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch 
         nextSanitationScore = 1500;
     }
   
-// Обновление таймера голода
-const hungerRemaining = Math.max(0, Math.ceil((CONFIG.hungerTime - (performance.now() - lastAppleTime)) / 1000));
-hungerTimerSpan.textContent = hungerRemaining;
     // Обновление полоски голода
 const hungerFraction = hungerRemaining / (CONFIG.hungerTime / 1000);
 hungerBar.style.height = (hungerFraction * 100) + '%';   // заполнено сверху
