@@ -40,11 +40,16 @@ function resetGame() {
 }
 
 function stopGame(msg) {
+    // Вычисляем бонус за время
+    const timeSec = Math.floor(gameTime / 1000);
+    const timeBonus = timeSec * 10;
+    const finalScore = score + timeBonus;
+    const scoreText = `Счёт: ${finalScore} (${score} + ${timeSec}×10)`;
+
     if (msg === 'Потомство уничтожено') {
         gameRunning = false; gameOverFlag = true;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
-       const finalScore = score + Math.floor(gameTime / 1000) * 10;
-gameOverDiv.textContent = msg || `Игра окончена! Счёт: ${finalScore} (${score} + ${Math.floor(gameTime / 1000)}×10). Пробел — рестарт`;
+        gameOverDiv.textContent = `Потомство уничтожено. ${scoreText}`;
         if (score > highScore) { highScore = score; highScoreSpan.textContent = highScore; localStorage.setItem('snakeHighScore', highScore); }
         bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
         awaitingHatch = false;
@@ -52,7 +57,7 @@ gameOverDiv.textContent = msg || `Игра окончена! Счёт: ${finalSc
     }
     if (egg && !awaitingHatch && gameRunning) {
         awaitingHatch = true;
-        gameOverDiv.textContent = 'Нажмите X, чтобы вылупиться';
+        gameOverDiv.textContent = `Нажмите X, чтобы вылупиться. ${scoreText}`;
         snake = []; prevSnake = []; dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
         gameRunning = false;
         bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
@@ -60,11 +65,12 @@ gameOverDiv.textContent = msg || `Игра окончена! Счёт: ${finalSc
     }
     gameRunning = false; gameOverFlag = true;
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    gameOverDiv.textContent = msg || 'Игра окончена! Нажми пробел для рестарта';
+    gameOverDiv.textContent = msg ? `${msg}. ${scoreText}` : `Игра окончена! ${scoreText}`;
     if (score > highScore) { highScore = score; highScoreSpan.textContent = highScore; localStorage.setItem('snakeHighScore', highScore); }
     bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
     awaitingHatch = false;
 }
+
     function startGameFromModal() {
     startModal.classList.remove('active');
     resetGame();   // запускаем новую игру
