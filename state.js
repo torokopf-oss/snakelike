@@ -7,7 +7,8 @@ const highScoreSpan = document.getElementById('highScoreDisplay');
 const gameOverDiv = document.getElementById('gameOverText');
 // Модальные окна
 const startModal = document.getElementById('startModal');
-const hungerBar = document.getElementById('hungerBar');
+const hungerBarBg = document.getElementById('hungerBarBg');
+const hungerBarOverlay = document.getElementById('hungerBarOverlay');
 const phase2Modal = document.getElementById('phase2Modal');
 const helpModal = document.getElementById('helpModal');
 const startButton = document.getElementById('startButton');
