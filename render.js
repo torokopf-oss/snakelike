@@ -259,8 +259,7 @@ if (worldDiscovered) {
     ctx.font = '16px "Segoe UI"';
     ctx.textAlign = 'center';
 
-    const lines = gameOverDiv.innerText.split('\n');
-    lines.forEach((line, i) => {
+    gameOverLines.forEach((line, i) => {
         ctx.fillText(line, canvas.width / 2, canvas.height / 2 - 10 + i * 22);
     });
 }
