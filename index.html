@@ -63,19 +63,26 @@
     position: relative;          /* для абсолютного позиционирования внутри */
 }
 
-#hungerBar {
+#hungerBarBg {
     position: absolute;
-    top: 0;                      /* начинается от верхнего края */
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 100%;                /* изначально полный */
+    height: 100%;                 /* всегда полный, жёлтый */
     background: #f1c40f;
-    transition: height 0.5s, background 0.5s;
-}
-#hungerBar.starving {
-    background: #e74c3c;
+    transition: background 0.5s;
 }
 
+#hungerBarOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;                   /* изначально нет чёрного */
+    background: #0f0f1a;          /* чёрный, как фон контейнера */
+    transition: height 0.5s;
+}
+        
        .help-button {
     margin-top: 12px;          /* отступ от таймера */
     background: none;
@@ -140,9 +147,10 @@
     <button class="help-button" id="helpButton">Справка</button>
 </div>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
-        <div id="hungerBarContainer">
-            <div id="hungerBar"></div>
-        </div>
+      <div id="hungerBarContainer">
+    <div id="hungerBarBg"></div>
+    <div id="hungerBarOverlay"></div>
+</div>
     </div>
     <div id="gameOverText" style="display: none;"></div>
 
