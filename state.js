@@ -18,7 +18,7 @@ const gameTimeSpan = document.getElementById('gameTimeDisplay');
 let gameTime = 0;                // прошедшее время активной игры (мс)
 let lastTimeUpdate = 0;          // момент последнего обновления счётчика времени
 const gameTimeDisplay = null;    // будет назначен позже
-const hungerTimerSpan = document.getElementById('hungerTimerDisplay');
+
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
 let dir = { x: 0, y: 0 }, nextDir = { x: 0, y: 0 };
