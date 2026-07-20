@@ -22,6 +22,7 @@ const gameTimeDisplay = null;    // будет назначен позже
 
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
+let gameOverLines = [];
 let dir = { x: 0, y: 0 }, nextDir = { x: 0, y: 0 };
 let score = 0, highScore = 0;
 let gameRunning = false, gameOverFlag = false;
