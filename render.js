@@ -252,11 +252,18 @@ if (worldDiscovered) {
         ctx.fillStyle = 'white'; ctx.font = '14px "Segoe UI"'; ctx.textAlign = 'center';
         ctx.fillText('Нажми пробел для старта', canvas.width/2, canvas.height/2);
     }
-    if (gameOverFlag) {
-        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = 'white'; ctx.font = '18px "Segoe UI"'; ctx.textAlign = 'center';
-        ctx.fillText(gameOverDiv.textContent, canvas.width/2, canvas.height/2);
-    }
+   if (gameOverFlag) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'white';
+    ctx.font = '16px "Segoe UI"';
+    ctx.textAlign = 'center';
+
+    const lines = gameOverDiv.innerText.split('\n');
+    lines.forEach((line, i) => {
+        ctx.fillText(line, canvas.width / 2, canvas.height / 2 - 10 + i * 22);
+    });
+}
     if (poopSnakeMessageText && now < poopSnakeMessageUntil) {
         const alpha = Math.min(1, (poopSnakeMessageUntil-now)/500);
         ctx.fillStyle = `rgba(255,100,0,${alpha})`; ctx.font = '16px "Segoe UI"'; ctx.textAlign = 'center';
