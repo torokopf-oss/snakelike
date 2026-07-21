@@ -10,8 +10,7 @@ function updatePlayer() {
     const head = snake[0];
     let newHead = { x: head.x + dir.x, y: head.y + dir.y };
 
-   if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < CONFIG.fullHeight) {
-    worldDiscovered = true;
+if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < maxY()) {    worldDiscovered = true;
     canvas.width = CONFIG.fullWidth * CONFIG.gridSize;
     lastEggTime = performance.now();
        
@@ -42,8 +41,7 @@ function updatePlayer() {
     phase2Modal.classList.add('active');
 }
 
-    if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= CONFIG.fullHeight) { stopGame(); return; }
-
+if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= maxY()) { stopGame(); return; }
     if (poopSnakeActive && poopSnake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) { stopGame('Вас сожрал Говноед!'); return; }
 
     const willEatFood = foods.some(f => f.x === newHead.x && f.y === newHead.y);
@@ -98,8 +96,8 @@ function fireLaser() {
     let x = snake[0].x + dir.x;
     let y = snake[0].y + dir.y;
     let hit = false;
-    while (x >= 0 && x < maxX() && y >= 0 && y < CONFIG.fullHeight) {
-        const foodIdx = foods.findIndex(f => f.x === x && f.y === y);
+while (x >= 0 && x < maxX() && y >= 0 && y < maxY()) {
+    const foodIdx = foods.findIndex(f => f.x === x && f.y === y);
         if (foodIdx !== -1) {
             foods.splice(foodIdx, 1);
             pushNewFoodCell();
@@ -159,14 +157,14 @@ function activateCheats() {
         dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 };
         egg = {
             x: Math.floor(Math.random() * CONFIG.viewWidth),
-            y: Math.floor(Math.random() * CONFIG.fullHeight)
+            y: Math.floor(Math.random() * maxY())
         };
         eggCooldown = 0; firstEggLaid = true; eggAppleCounter = 0;
         score = 1000; scoreSpan.textContent = score;
     } else {
         egg = {
             x: Math.floor(Math.random() * CONFIG.fullWidth),
-            y: Math.floor(Math.random() * CONFIG.fullHeight)
+            y: Math.floor(Math.random() * maxY())
         };
         eggCooldown = 0; firstEggLaid = true; eggAppleCounter = 0;
         score += 1000; scoreSpan.textContent = score;
