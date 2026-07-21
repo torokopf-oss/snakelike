@@ -6,17 +6,9 @@ function updateBabies() {
         const head = baby[0];
         let fleeTarget = null;
         if (poopSnakeActive && poopSnake.length > 0) {
-    let minDist = Infinity;
-    let closestSeg = null;
-    for (const seg of poopSnake) {
-        const d = Math.abs(seg.x - head.x) + Math.abs(seg.y - head.y);
-        if (d < minDist) {
-            minDist = d;
-            closestSeg = seg;
+            const d = Math.abs(poopSnake[0].x - head.x) + Math.abs(poopSnake[0].y - head.y);
+            if (d <= 5) fleeTarget = poopSnake[0];
         }
-    }
-    if (closestSeg && minDist <= 5) fleeTarget = closestSeg;
-}
         if (!fleeTarget) {
             for (const v of vultures) {
                 const d = Math.abs(v.x - head.x) + Math.abs(v.y - head.y);
@@ -57,8 +49,7 @@ function updateBabies() {
             if (snake.some(s => s.x === newHead.x && s.y === newHead.y)) continue;
         }
 
-        const maxX = worldDiscovered ? CONFIG.fullWidth : CONFIG.viewWidth;
-        if (newHead.x < 0 || newHead.x >= maxX || newHead.y < 0 || newHead.y >= maxY()) {
+        if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= maxY()) {
             babyDirections[b] = { x: -desiredDir.x, y: -desiredDir.y };
             newHead = { x: head.x + babyDirections[b].x, y: head.y + babyDirections[b].y };
         }
@@ -72,26 +63,6 @@ function updateBabies() {
             foods.splice(foodIdx, 1);
             score += 2; scoreSpan.textContent = score; applesEaten++;
             pushNewFoodCell();
-
-            // Какашка позади хвоста детёныша
-            if (applesEaten % 2 === 0) {
-                const tail = baby[baby.length - 1];
-                const d = babyDirections[b];
-                const behind = { x: tail.x - d.x, y: tail.y - d.y };
-                if (isCellFree(behind.x, behind.y)) {
-                    poops.push(behind);
-                } else {
-                    const neighbors = [
-                        { x: tail.x + 1, y: tail.y },
-                        { x: tail.x - 1, y: tail.y },
-                        { x: tail.x, y: tail.y + 1 },
-                        { x: tail.x, y: tail.y - 1 }
-                    ];
-                    const free = neighbors.filter(nb => isCellFree(nb.x, nb.y));
-                    if (free.length) poops.push(free[Math.floor(Math.random() * free.length)]);
-                }
-            }
-
             if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
             else baby.pop();
         } else {
