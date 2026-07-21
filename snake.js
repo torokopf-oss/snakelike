@@ -9,7 +9,7 @@ function updatePlayer() {
 
     const head = snake[0];
     let newHead = { x: head.x + dir.x, y: head.y + dir.y };
-
+    const willEatVulture = vultures.some(v => v.x === newHead.x && v.y === newHead.y);
     // Пробитие правой стены (длина 30)
     if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < maxY()) {
         worldDiscovered = true;
@@ -52,7 +52,7 @@ function updatePlayer() {
     const willEatFood = foods.some(f => f.x === newHead.x && f.y === newHead.y);
     const willEatPoop = poops.some(p => p.x === newHead.x && p.y === newHead.y);
     const willEatPill = pill && pill.x === newHead.x && pill.y === newHead.y;
-    const bodyToCheck = (willEatFood || willEatPoop || willEatPill) ? snake : snake.slice(0, -1);
+    const bodyToCheck = (willEatFood || willEatPoop || willEatPill || willEatVulture) ? snake : snake.slice(0, -1);
     if (bodyToCheck.some(seg => seg.x === newHead.x && seg.y === newHead.y)) { stopGame(); return; }
 
     let ateApple = false;
@@ -87,11 +87,25 @@ function updatePlayer() {
     } else if (willEatPill) {
         snake.unshift(newHead); snake.pop();
         pill = null; poisonActive = false;
-    } else if (ateApple) {
+        } else if (ateApple) {
         const oldTail = snake[snake.length - 1];
-        snake.unshift(newHead); prevSnake.push({ ...oldTail });
+        snake.unshift(newHead);
+        prevSnake.push({ ...oldTail });
+    } else if (willEatVulture) {
+        // поедание стервятника
+        const oldTail = snake[snake.length - 1];
+        snake.unshift(newHead);
+        prevSnake.push({ ...oldTail });   // удлинение без потери хвоста
+        score += 50;
+        scoreSpan.textContent = score;
+        const vIdx = vultures.findIndex(v => v.x === newHead.x && v.y === newHead.y);
+        if (vIdx !== -1) {
+            vultures.splice(vIdx, 1);
+            prevVultures.splice(vIdx, 1);
+        }
     } else {
-        snake.unshift(newHead); snake.pop();
+        snake.unshift(newHead);
+        snake.pop();
         foods.forEach(f => moveFoodLazy(f));
     }
     if (eggCooldown > 0) eggCooldown--;
