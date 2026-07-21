@@ -97,7 +97,7 @@ function updateBullet() {
     if (!bullet || worldDiscovered) return;
     for (let step = 1; step <= CONFIG.bulletSpeed; step++) {
         const checkX = Math.round(bullet.x + bullet.dirX * step), checkY = Math.round(bullet.y + bullet.dirY * step);
-        if (checkX < 0 || checkX >= maxX() || checkY < 0 || checkY >= CONFIG.fullHeight) { bullet = null; return; }
+        if (checkX < 0 || checkX >= maxX() || checkY < 0 || checkY >= maxY()) { bullet = null; return; }
         const foodIdx = foods.findIndex(f => f.x === checkX && f.y === checkY);
         if (foodIdx !== -1) {
             foods.splice(foodIdx, 1); pushNewFoodCell();
