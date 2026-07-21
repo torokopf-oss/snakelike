@@ -16,6 +16,7 @@ const phase2Button = document.getElementById('phase2Button');
 const helpButton = document.getElementById('helpButton');
 const closeHelpButton = document.getElementById('closeHelpButton');
 const gameTimeSpan = document.getElementById('gameTimeDisplay');
+let worldDiscoveredDown = false;
 let gameTime = 0;                // прошедшее время активной игры (мс)
 let lastTimeUpdate = 0;          // момент последнего обновления счётчика времени
 const gameTimeDisplay = null;    // будет назначен позже

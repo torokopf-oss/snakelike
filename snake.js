@@ -10,39 +10,42 @@ function updatePlayer() {
     const head = snake[0];
     let newHead = { x: head.x + dir.x, y: head.y + dir.y };
 
-   if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < CONFIG.fullHeight) {
-    worldDiscovered = true;
-    canvas.width = CONFIG.fullWidth * CONFIG.gridSize;
-    lastEggTime = performance.now();
-       
-    // 1. Вылупление из яйца (если есть)
+    // Пробитие правой стены (длина 30)
+    if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < maxY()) {
+        worldDiscovered = true;
+        canvas.width = CONFIG.fullWidth * CONFIG.gridSize;
+        lastEggTime = performance.now();
 
-    
-    // 2. Укорачиваем змейку вдвое
-    const newLen = Math.floor(snake.length / 2);
-    // Отрезаем хвост для создания детёныша (3 клетки)
-    const babyHead = snake[snake.length - 3] || snake[snake.length - 1]; // если длина < 3, берём последний сегмент
-    snake = snake.slice(0, newLen);
-    prevSnake = snake.map(s => ({...s}));
-    
-    // 3. Создаём детёныша из отрезанного хвоста (3 клетки)
-    const baby = [
-        { x: babyHead.x, y: babyHead.y },
-        { x: babyHead.x - dir.x, y: babyHead.y - dir.y },
-        { x: babyHead.x - dir.x * 2, y: babyHead.y - dir.y * 2 }
-    ];
-    babySnakes.push(baby);
-    babyPrevSnakes.push(baby.map(s => ({...s})));
-    babyDirections.push({ ...dir });
-    hadBabies = true;
-    
-    generateFoods();
-    eggCooldown = 0;   // сбрасываем старый кулдаун (теперь он временной)
-    bullet = null;
-    phase2Modal.classList.add('active');
-}
+        const newLen = Math.floor(snake.length / 2);
+        const babyHead = snake[snake.length - 3] || snake[snake.length - 1];
+        snake = snake.slice(0, newLen);
+        prevSnake = snake.map(s => ({...s}));
 
-    if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= CONFIG.fullHeight) { stopGame(); return; }
+        const baby = [
+            { x: babyHead.x, y: babyHead.y },
+            { x: babyHead.x - dir.x, y: babyHead.y - dir.y },
+            { x: babyHead.x - dir.x * 2, y: babyHead.y - dir.y * 2 }
+        ];
+        babySnakes.push(baby);
+        babyPrevSnakes.push(baby.map(s => ({...s})));
+        babyDirections.push({ ...dir });
+        hadBabies = true;
+
+        generateFoods();
+        eggCooldown = 0;
+        bullet = null;
+        phase2Modal.classList.add('active');
+    }
+
+    // Пробитие нижней стены (4+ детёнышей)
+    if (!worldDiscoveredDown && babySnakes.length >= CONFIG.babyThresholdForThirdPhase &&
+        newHead.y === CONFIG.viewHeight && newHead.x >= 0 && newHead.x < maxX()) {
+        worldDiscoveredDown = true;
+        canvas.height = CONFIG.fullHeight * CONFIG.gridSize;
+        generateFoods();
+    }
+
+    if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= maxY()) { stopGame(); return; }
 
     if (poopSnakeActive && poopSnake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) { stopGame('Вас сожрал Говноед!'); return; }
 
@@ -60,7 +63,7 @@ function updatePlayer() {
             isStarving = false;
             ateApple = true;
             applesEaten++;
-            score += 10 + snake.length; 
+            score += 10 + snake.length;
             scoreSpan.textContent = score;
             snake[snake.length - 1].glowUntil = performance.now() + 500;
             break;
@@ -98,7 +101,7 @@ function fireLaser() {
     let x = snake[0].x + dir.x;
     let y = snake[0].y + dir.y;
     let hit = false;
-    while (x >= 0 && x < maxX() && y >= 0 && y < CONFIG.fullHeight) {
+    while (x >= 0 && x < maxX() && y >= 0 && y < maxY()) {
         const foodIdx = foods.findIndex(f => f.x === x && f.y === y);
         if (foodIdx !== -1) {
             foods.splice(foodIdx, 1);
@@ -159,14 +162,14 @@ function activateCheats() {
         dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 };
         egg = {
             x: Math.floor(Math.random() * CONFIG.viewWidth),
-            y: Math.floor(Math.random() * CONFIG.fullHeight)
+            y: Math.floor(Math.random() * maxY())
         };
         eggCooldown = 0; firstEggLaid = true; eggAppleCounter = 0;
         score = 1000; scoreSpan.textContent = score;
     } else {
         egg = {
             x: Math.floor(Math.random() * CONFIG.fullWidth),
-            y: Math.floor(Math.random() * CONFIG.fullHeight)
+            y: Math.floor(Math.random() * maxY())
         };
         eggCooldown = 0; firstEggLaid = true; eggAppleCounter = 0;
         score += 1000; scoreSpan.textContent = score;

@@ -5,10 +5,10 @@ function spawnPoopSnake() {
     const side = spawnSide !== -1 ? spawnSide : Math.floor(Math.random() * (worldDiscovered ? 4 : 3));
     spawnSide = -1;
     let startX, startY, dx, dy;
-    if (side === 0) { startX = -1; startY = Math.floor(Math.random() * CONFIG.fullHeight); dx = 1; dy = 0; }
-    else if (side === 1) { startX = CONFIG.fullWidth; startY = Math.floor(Math.random() * CONFIG.fullHeight); dx = -1; dy = 0; }
+    if (side === 0) { startX = -1; startY = Math.floor(Math.random() * maxY()); dx = 1; dy = 0; }
+    else if (side === 1) { startX = CONFIG.fullWidth; startY = Math.floor(Math.random() * maxY()); dx = -1; dy = 0; }
     else if (side === 2) { startX = Math.floor(Math.random() * maxX()); startY = -1; dx = 0; dy = 1; }
-    else { startX = Math.floor(Math.random() * maxX()); startY = CONFIG.fullHeight; dx = 0; dy = -1; }
+    else { startX = Math.floor(Math.random() * maxX()); startY = maxY(); dx = 0; dy = -1; }
     poopSnake = [];
     for (let i = 0; i < 7; i++) poopSnake.push({ x: startX - dx * i, y: startY - dy * i });
     prevPoopSnake = poopSnake.map(s => ({...s}));
@@ -33,15 +33,15 @@ function updatePoopSnake() {
             if (d < minDist) { minDist = d; target = p; }
         }
     } else {
-        if (head.x < 0 || head.x >= maxX() || head.y < 0 || head.y >= CONFIG.fullHeight)
+        if (head.x < 0 || head.x >= maxX() || head.y < 0 || head.y >= maxY())
             desiredDir = { ...poopSnakeDir };
         else {
-            const dists = [head.x + 1, maxX() - head.x, head.y + 1, CONFIG.fullHeight - head.y];
+            const dists = [head.x + 1, maxX() - head.x, head.y + 1, maxY() - head.y];
             const min = Math.min(...dists);
             if (min === dists[0]) target = { x: -1, y: head.y };
             else if (min === dists[1]) target = { x: maxX(), y: head.y };
             else if (min === dists[2]) target = { x: head.x, y: -1 };
-            else target = { x: head.x, y: CONFIG.fullHeight };
+            else target = { x: head.x, y: maxY() };
         }
     }
     if (!desiredDir && target) {
@@ -68,7 +68,7 @@ function updatePoopSnake() {
     const newHead = { x: head.x + desiredDir.x, y: head.y + desiredDir.y };
     poopSnake.unshift(newHead);
     let ate = false;
-    if (newHead.x >= 0 && newHead.x < maxX() && newHead.y >= 0 && newHead.y < CONFIG.fullHeight) {
+    if (newHead.x >= 0 && newHead.x < maxX() && newHead.y >= 0 && newHead.y < maxY()) {
         const idx = poops.findIndex(p => p.x === newHead.x && p.y === newHead.y);
         if (idx !== -1) { poops.splice(idx, 1); ate = true; }
         if (snake.some(s => s.x === newHead.x && s.y === newHead.y)) { stopGame('Вас сожрал Говноед!'); return; }
@@ -79,7 +79,7 @@ function updatePoopSnake() {
         }
     }
     if (!ate) poopSnake.pop();
-    if (poops.length === 0 && poopSnake.every(s => s.x < 0 || s.x >= maxX() || s.y < 0 || s.y >= CONFIG.fullHeight)) {
+    if (poops.length === 0 && poopSnake.every(s => s.x < 0 || s.x >= maxX() || s.y < 0 || s.y >= maxY())) {
         poopSnakeActive = false; poopSnake = []; prevPoopSnake = []; poopSnakeMessageText = ''; warningActive = false; spawnSide = -1;
     }
 }
@@ -105,14 +105,14 @@ function updateVultures() {
     for (let i = vultures.length - 1; i >= 0; i--) {
         const v = vultures[i];
         if (v.escaping) {
-            const distLeft = v.x + 1, distRight = maxX() - v.x, distTop = v.y + 1, distBottom = CONFIG.fullHeight - v.y;
+            const distLeft = v.x + 1, distRight = maxX() - v.x, distTop = v.y + 1, distBottom = maxY() - v.y;
             const minDist = Math.min(distLeft, distRight, distTop, distBottom);
             if (minDist === distLeft) { v.dirX = -1; v.dirY = 0; }
             else if (minDist === distRight) { v.dirX = 1; v.dirY = 0; }
             else if (minDist === distTop) { v.dirX = 0; v.dirY = -1; }
             else { v.dirX = 0; v.dirY = 1; }
             const newX = v.x + v.dirX, newY = v.y + v.dirY;
-            if (newX < 0 || newX >= maxX() || newY < 0 || newY >= CONFIG.fullHeight) {
+            if (newX < 0 || newX >= maxX() || newY < 0 || newY >= maxY()) {
                 vultures.splice(i, 1); prevVultures.splice(i, 1);
             } else if (!snake.some(s => s.x === newX && s.y === newY)) { v.x = newX; v.y = newY; }
             continue;
@@ -135,7 +135,7 @@ function updateVultures() {
             }
         }
         const newX = v.x + v.dirX, newY = v.y + v.dirY;
-        if (newX < 0 || newX >= maxX() || newY < 0 || newY >= CONFIG.fullHeight) { vultures.splice(i, 1); prevVultures.splice(i, 1); continue; }
+        if (newX < 0 || newX >= maxX() || newY < 0 || newY >= maxY()) { vultures.splice(i, 1); prevVultures.splice(i, 1); continue; }
         if (snake.some(s => s.x === newX && s.y === newY)) continue;
         let bitten = false;
         for (let b = babySnakes.length - 1; b >= 0; b--) {
@@ -162,10 +162,10 @@ function spawnVultures(count) {
     for (let i = 0; i < count; i++) {
         const side = Math.floor(Math.random() * 4);
         let x, y, dx, dy;
-        if (side === 0) { x = -1; y = Math.floor(Math.random() * CONFIG.fullHeight); dx = 1; dy = 0; }
-        else if (side === 1) { x = CONFIG.fullWidth; y = Math.floor(Math.random() * CONFIG.fullHeight); dx = -1; dy = 0; }
+        if (side === 0) { x = -1; y = Math.floor(Math.random() * maxY()); dx = 1; dy = 0; }
+        else if (side === 1) { x = CONFIG.fullWidth; y = Math.floor(Math.random() * maxY()); dx = -1; dy = 0; }
         else if (side === 2) { x = Math.floor(Math.random() * CONFIG.fullWidth); y = -1; dx = 0; dy = 1; }
-        else { x = Math.floor(Math.random() * CONFIG.fullWidth); y = CONFIG.fullHeight; dx = 0; dy = -1; }
+        else { x = Math.floor(Math.random() * CONFIG.fullWidth); y = maxY(); dx = 0; dy = -1; }
         vultures.push({ x, y, dirX: dx, dirY: dy, escaping: false });
         prevVultures.push({ x, y, dirX: dx, dirY: dy, escaping: false });
     }
