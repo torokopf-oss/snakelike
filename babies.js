@@ -58,7 +58,7 @@ function updateBabies() {
         }
 
         const maxX = worldDiscovered ? CONFIG.fullWidth : CONFIG.viewWidth;
-        if (newHead.x < 0 || newHead.x >= maxX || newHead.y < 0 || newHead.y >= CONFIG.fullHeight) {
+        if (newHead.x < 0 || newHead.x >= maxX || newHead.y < 0 || newHead.y >= maxY()) {
             babyDirections[b] = { x: -desiredDir.x, y: -desiredDir.y };
             newHead = { x: head.x + babyDirections[b].x, y: head.y + babyDirections[b].y };
         }
