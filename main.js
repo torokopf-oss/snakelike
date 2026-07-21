@@ -27,6 +27,8 @@ function resetGame() {
     jailMode = false; jailSnake = []; jailPrevSnake = []; awaitingJailStart = false; awaitingJailReason = '';
     jailCountdown = false; flashStart = 0; laserStart = 0;
     worldDiscovered = false; canvas.width = 400;
+    worldDiscoveredDown = false;
+    canvas.height = CONFIG.viewHeight * CONFIG.gridSize;   // или 400
     egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
     lastEggTime = 0;
     lastAppleTime = performance.now();
