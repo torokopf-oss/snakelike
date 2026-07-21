@@ -8,7 +8,7 @@ function spawnPoopSnake() {
     if (side === 0) { startX = -1; startY = Math.floor(Math.random() * maxY()); dx = 1; dy = 0; }
     else if (side === 1) { startX = CONFIG.fullWidth; startY = Math.floor(Math.random() * maxY()); dx = -1; dy = 0; }
     else if (side === 2) { startX = Math.floor(Math.random() * maxX()); startY = -1; dx = 0; dy = 1; }
-    else { startX = Math.floor(Math.random() * maxX()); startY = CONFIG.fullHeight; dx = 0; dy = -1; }
+    else { startX = Math.floor(Math.random() * maxX()); startY = maxY(); dx = 0; dy = -1; }
     poopSnake = [];
     for (let i = 0; i < 7; i++) poopSnake.push({ x: startX - dx * i, y: startY - dy * i });
     prevPoopSnake = poopSnake.map(s => ({...s}));
@@ -36,12 +36,12 @@ function updatePoopSnake() {
         if (head.x < 0 || head.x >= maxX() || head.y < 0 || head.y >= maxY())
             desiredDir = { ...poopSnakeDir };
         else {
-            const dists = [head.x + 1, maxX() - head.x, head.y + 1, CONFIG.fullHeight - head.y];
+            const dists = [head.x + 1, maxX() - head.x, head.y + 1, maxY() - head.y];
             const min = Math.min(...dists);
             if (min === dists[0]) target = { x: -1, y: head.y };
             else if (min === dists[1]) target = { x: maxX(), y: head.y };
             else if (min === dists[2]) target = { x: head.x, y: -1 };
-            else target = { x: head.x, y: CONFIG.fullHeight };
+            else target = { x: head.x, y: maxY() };
         }
     }
     if (!desiredDir && target) {
@@ -105,7 +105,7 @@ function updateVultures() {
     for (let i = vultures.length - 1; i >= 0; i--) {
         const v = vultures[i];
         if (v.escaping) {
-            const distLeft = v.x + 1, distRight = maxX() - v.x, distTop = v.y + 1, distBottom = CONFIG.fullHeight - v.y;
+            const distLeft = v.x + 1, distRight = maxX() - v.x, distTop = v.y + 1, distBottom = maxY() - v.y;
             const minDist = Math.min(distLeft, distRight, distTop, distBottom);
             if (minDist === distLeft) { v.dirX = -1; v.dirY = 0; }
             else if (minDist === distRight) { v.dirX = 1; v.dirY = 0; }
@@ -165,7 +165,7 @@ function spawnVultures(count) {
         if (side === 0) { x = -1; y = Math.floor(Math.random() * maxY()); dx = 1; dy = 0; }
         else if (side === 1) { x = CONFIG.fullWidth; y = Math.floor(Math.random() * maxY()); dx = -1; dy = 0; }
         else if (side === 2) { x = Math.floor(Math.random() * CONFIG.fullWidth); y = -1; dx = 0; dy = 1; }
-        else { x = Math.floor(Math.random() * CONFIG.fullWidth); y = CONFIG.fullHeight; dx = 0; dy = -1; }
+        else { x = Math.floor(Math.random() * CONFIG.fullWidth); y = maxY(); dx = 0; dy = -1; }
         vultures.push({ x, y, dirX: dx, dirY: dy, escaping: false });
         prevVultures.push({ x, y, dirX: dx, dirY: dy, escaping: false });
     }
