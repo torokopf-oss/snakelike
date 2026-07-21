@@ -1,7 +1,7 @@
 const maxX = () => worldDiscovered ? CONFIG.fullWidth : CONFIG.viewWidth;
-
+const maxY = () => worldDiscoveredDown ? CONFIG.fullHeight : CONFIG.viewHeight;
 function isCellFree(x, y, ignorePill = false, ignoreVultures = false) {
-    if (x < 0 || x >= maxX() || y < 0 || y >= CONFIG.fullHeight) return false;
+    if (x < 0 || x >= maxX() || y < 0 || y >= maxY()) return false;
     if (snake.some(s => s.x === x && s.y === y)) return false;
     if (foods.some(f => f.x === x && f.y === y)) return false;
     if (poops.some(p => p.x === x && p.y === y)) return false;
@@ -20,7 +20,7 @@ function randomFreeCell(ignorePill = false) {
     do {
         cell = {
             x: Math.floor(Math.random() * maxX()),
-            y: Math.floor(Math.random() * CONFIG.fullHeight)
+            y: Math.floor(Math.random() * maxY())
         };
         attempts++;
     } while (!isCellFree(cell.x, cell.y, ignorePill) && attempts < 200);
@@ -94,11 +94,11 @@ function drawGame(t, now) {
     const gs = CONFIG.gridSize;
 
     ctx.strokeStyle = '#0f3460'; ctx.lineWidth = 0.5;
-    for (let i = 0; i <= CONFIG.fullHeight; i++) {
-        ctx.beginPath(); ctx.moveTo(0, i*gs); ctx.lineTo(viewCells*gs, i*gs); ctx.stroke();
+    for (let i = 0; i <= maxY(); i++) {
+    ctx.beginPath(); ctx.moveTo(0, i*gs); ctx.lineTo(viewCells*gs, i*gs); ctx.stroke();
     }
     for (let i = 0; i <= viewCells; i++) {
-        ctx.beginPath(); ctx.moveTo(i*gs, 0); ctx.lineTo(i*gs, CONFIG.fullHeight*gs); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(i*gs, 0); ctx.lineTo(i*gs, maxY() * gs); ctx.stroke();
     }
 
     // Вспышка санации
@@ -111,7 +111,7 @@ function drawGame(t, now) {
         const wallX = CONFIG.viewWidth * gs;
         ctx.save();
         ctx.strokeStyle = '#2ecc71'; ctx.lineWidth = 3; ctx.shadowBlur = 10; ctx.shadowColor = '#2ecc71';
-        ctx.beginPath(); ctx.moveTo(wallX, 0); ctx.lineTo(wallX, CONFIG.fullHeight * gs); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(wallX, 0); ctx.lineTo(wallX, maxY() * gs); ctx.stroke();
         ctx.restore();
     }
 
@@ -120,10 +120,10 @@ function drawGame(t, now) {
         const pulse = Math.sin(warningPulse)*0.4+0.6, gw = 20;
         ctx.save();
         ctx.fillStyle = `rgba(255,80,0,${pulse*0.8})`; ctx.shadowBlur = 15; ctx.shadowColor = '#ff5000';
-        if (spawnSide === 0) ctx.fillRect(0, 0, gw, CONFIG.fullHeight*gs);
-        else if (spawnSide === 1) ctx.fillRect(viewCells*gs - gw, 0, gw, CONFIG.fullHeight*gs);
+        if (spawnSide === 0) ctx.fillRect(0, 0, gw, maxY() * gs);
+        else if (spawnSide === 1) ctx.fillRect(canvas.width - gw, 0, gw, maxY() * gs);
         else if (spawnSide === 2) ctx.fillRect(0, 0, viewCells*gs, gw);
-        else if (spawnSide === 3) ctx.fillRect(0, CONFIG.fullHeight*gs - gw, viewCells*gs, gw);
+        else if (spawnSide === 3) ctx.fillRect(0, maxY() * gs - gw, viewCells*gs, gw);
         ctx.restore();
     }
 
@@ -252,11 +252,17 @@ if (worldDiscovered) {
         ctx.fillStyle = 'white'; ctx.font = '14px "Segoe UI"'; ctx.textAlign = 'center';
         ctx.fillText('Нажми пробел для старта', canvas.width/2, canvas.height/2);
     }
-    if (gameOverFlag) {
-        ctx.fillStyle = 'rgba(0,0,0,0.6)'; ctx.fillRect(0,0,canvas.width,canvas.height);
-        ctx.fillStyle = 'white'; ctx.font = '18px "Segoe UI"'; ctx.textAlign = 'center';
-        ctx.fillText(gameOverDiv.textContent, canvas.width/2, canvas.height/2);
-    }
+   if (gameOverFlag) {
+    ctx.fillStyle = 'rgba(0,0,0,0.6)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = 'white';
+    ctx.font = '16px "Segoe UI"';
+    ctx.textAlign = 'center';
+
+    gameOverLines.forEach((line, i) => {
+        ctx.fillText(line, canvas.width / 2, canvas.height / 2 - 10 + i * 22);
+    });
+}
     if (poopSnakeMessageText && now < poopSnakeMessageUntil) {
         const alpha = Math.min(1, (poopSnakeMessageUntil-now)/500);
         ctx.fillStyle = `rgba(255,100,0,${alpha})`; ctx.font = '16px "Segoe UI"'; ctx.textAlign = 'center';

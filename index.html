@@ -7,53 +7,174 @@
     <style>
         body {
             margin: 0; padding: 0;
-            display: flex; justify-content: center; align-items: center;
-            min-height: 100vh;
             background: #1a1a2e;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             user-select: none;
-            overflow: hidden;
+            overflow-x: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
         }
-        .game-container { text-align: center; }
+
+        .game-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .game-area {
+            display: flex;
+            flex-direction: row;
+            align-items: flex-start;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .side-panel {
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            gap: 8px;
+            color: white;
+            font-size: 16px;
+            width: 120px;
+            text-align: left;
+        }
+
+        .info-item {
+            white-space: nowrap;
+        }
+
         canvas {
             border: 2px solid #e94560;
             background: #16213e;
-            display: block; margin: 0 auto;
             box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
-            max-width: 100%;
         }
-        .info {
-            color: white; margin-bottom: 10px; font-size: 18px;
-            display: flex; justify-content: space-between;
-            width: 400px; margin-left: auto; margin-right: auto;
+
+    #hungerBarContainer {
+    width: 14px;
+    height: 400px;               /* строго как холст */
+    background: #0f0f1a;
+    border: 1px solid #e94560;
+    border-radius: 4px;
+    overflow: hidden;
+    flex-shrink: 0;
+    position: relative;          /* для абсолютного позиционирования внутри */
+}
+
+#hungerBarBg {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;                 /* всегда полный, жёлтый */
+    background: #f1c40f;
+    transition: background 0.5s;
+}
+
+#hungerBarOverlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 0%;                   /* изначально нет чёрного */
+    background: #0f0f1a;          /* чёрный, как фон контейнера */
+    transition: height 0.5s;
+}
+        
+       .help-button {
+    margin-top: 12px;          /* отступ от таймера */
+    background: none;
+    border: 1px solid #aaa;
+    color: #aaa;
+    padding: 4px 12px;
+    font-size: 14px;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;               /* на всю ширину панели */
+    text-align: center;
+}
+
+        .modal {
+            display: none;
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 10;
+            justify-content: center;
             align-items: center;
+            flex-direction: column;
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
         }
-        .info > span {
-            display: inline-block;
-            width: 100px;
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal h2 {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .modal p {
+            font-size: 18px;
+            margin-bottom: 20px;
             text-align: center;
-            white-space: nowrap;
         }
-        .game-over-text {
-            color: #e94560; font-size: 28px; margin-top: 10px; height: 34px;
+
+        .modal button {
+            padding: 10px 30px;
+            font-size: 20px;
+            background: #e94560;
+            border: none;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
-<div class="game-container">
-    <div class="info">
-        <span>🍎 Очки: <span id="scoreDisplay">0</span></span>
-        <span>💩 <span id="poopEatenDisplay">0/5</span></span>
-        <span>🏆 Рекорд: <span id="highScoreDisplay">0</span></span>
-        <span>⏱️ <span id="hungerTimerDisplay">15</span></span>
+<div class="game-container" id="gameContainer">
+    <div class="game-area">
+    <div class="side-panel">
+    <div class="info-item">🍎 Очки: <span id="scoreDisplay">0</span></div>
+    <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
+    <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
+    <div class="info-item">🕒 <span id="gameTimeDisplay">00:00</span></div>
+    <button class="help-button" id="helpButton">Справка</button>
+</div>
+        <canvas id="gameCanvas" width="400" height="400"></canvas>
+      <div id="hungerBarContainer">
+    <div id="hungerBarBg"></div>
+    <div id="hungerBarOverlay"></div>
+</div>
     </div>
-    <canvas id="gameCanvas" width="400" height="400"></canvas>
-    <div class="game-over-text" id="gameOverText"></div>
-    <p style="color: #aaa; margin-top: 10px;">Управление: стрелки ←↑↓→ | Z — лазер (после стены) / пуля | S — санация | X — яйцо / вылупить | P — пауза | Пробел — старт / тюрьма / рестарт</p>
-    <p style="color: #888; font-size: 14px;">Отравление -5% очков/сек. Лазер / пуля убивает Говноеда, стервятников и яблоко.</p>
+    <div id="gameOverText" style="display: none;"></div>
+
+    <div class="modal active" id="startModal">
+        <h2>Змейка</h2>
+        <p>Питаться и расти, не умереть.</p>
+        <button id="startButton">Начать (пробел)</button>
+    </div>
+    <div class="modal" id="phase2Modal">
+        <h2>Выводок</h2>
+        <p>Питаться и размножаться, защищать потомство.</p>
+        <button id="phase2Button">Продолжить (пробел)</button>
+    </div>
+    <div class="modal" id="helpModal">
+        <h2>Управление</h2>
+        <p>Движение: стрелки<br>
+        Выстрел: Z<br>
+        Отложить яйцо / вылупить (если доступно): X<br>
+        Пауза: P<br>
+        Санация: S (накапливайте очки, чтобы восполнить заряды)</p>
+        <button id="closeHelpButton">Закрыть (H)</button>
+    </div>
 </div>
 
-<!-- Загрузка модулей в правильном порядке -->
 <script src="config.js"></script>
 <script src="state.js"></script>
 <script src="render.js"></script>

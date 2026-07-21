@@ -1,5 +1,15 @@
 function resetGame() {
+    gameTime = 0;
+    lastTimeUpdate = performance.now();
+    gameTimeSpan.textContent = '0';
+    hungerBarOverlay.style.height = '0%';
+    hungerBarBg.classList.remove('starving');
+   
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    // Показываем стартовое окно
+    phase2Modal.classList.remove('active');
+    helpModal.classList.remove('active');
+    pauseStartTime = 0;
     snake = [{ x: 10, y: 10 }]; prevSnake = [{ x: 10, y: 10 }];
     dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
     score = 0; playerPoopsEaten = 0; applesEaten = 0;
@@ -17,10 +27,11 @@ function resetGame() {
     jailMode = false; jailSnake = []; jailPrevSnake = []; awaitingJailStart = false; awaitingJailReason = '';
     jailCountdown = false; flashStart = 0; laserStart = 0;
     worldDiscovered = false; canvas.width = 400;
+    worldDiscoveredDown = false;
+    canvas.height = CONFIG.viewHeight * CONFIG.gridSize;   // или 400
     egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
     lastEggTime = 0;
     lastAppleTime = performance.now();
-    hungerTimerSpan.textContent = '15';
     isStarving = false;
     lastHungerTick = 0;
     babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
@@ -31,10 +42,15 @@ function resetGame() {
 }
 
 function stopGame(msg) {
+    const timeSec = Math.floor(gameTime / 1000);
+    const timeBonus = timeSec;
+    const finalScore = score + timeBonus;
+    const reason = msg || 'Игра окончена!';
+const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec} сек)`;
     if (msg === 'Потомство уничтожено') {
         gameRunning = false; gameOverFlag = true;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
-        gameOverDiv.textContent = msg;
+        gameOverLines = [`Потомство уничтожено`, scoreLine];
         if (score > highScore) { highScore = score; highScoreSpan.textContent = highScore; localStorage.setItem('snakeHighScore', highScore); }
         bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
         awaitingHatch = false;
@@ -42,7 +58,7 @@ function stopGame(msg) {
     }
     if (egg && !awaitingHatch && gameRunning) {
         awaitingHatch = true;
-        gameOverDiv.textContent = 'Нажмите X, чтобы вылупиться';
+        gameOverLines = ['Нажмите X, чтобы вылупиться'];
         snake = []; prevSnake = []; dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
         gameRunning = false;
         bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
@@ -50,17 +66,40 @@ function stopGame(msg) {
     }
     gameRunning = false; gameOverFlag = true;
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    gameOverDiv.textContent = msg || 'Игра окончена! Нажми пробел для рестарта';
+    gameOverLines = [reason, scoreLine];
     if (score > highScore) { highScore = score; highScoreSpan.textContent = highScore; localStorage.setItem('snakeHighScore', highScore); }
     bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
     awaitingHatch = false;
 }
 
+    function startGameFromModal() {
+    startModal.classList.remove('active');
+    resetGame();   // запускаем новую игру
+}
+
+function continueFromPhase2() {
+    phase2Modal.classList.remove('active');
+    // игра продолжается, мы уже в фазе 2
+}
+
+function toggleHelp() {
+    if (helpModal.classList.contains('active')) {
+        helpModal.classList.remove('active');
+    } else {
+        helpModal.classList.add('active');
+    }
+}
+// Привязка кнопок модальных окон
+startButton.addEventListener('click', startGameFromModal);
+phase2Button.addEventListener('click', continueFromPhase2);
+helpButton.addEventListener('click', toggleHelp);
+closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
+
 function updateBullet() {
     if (!bullet || worldDiscovered) return;
     for (let step = 1; step <= CONFIG.bulletSpeed; step++) {
         const checkX = Math.round(bullet.x + bullet.dirX * step), checkY = Math.round(bullet.y + bullet.dirY * step);
-        if (checkX < 0 || checkX >= maxX() || checkY < 0 || checkY >= CONFIG.fullHeight) { bullet = null; return; }
+        if (checkX < 0 || checkX >= maxX() || checkY < 0 || checkY >= maxY()) { bullet = null; return; }
         const foodIdx = foods.findIndex(f => f.x === checkX && f.y === checkY);
         if (foodIdx !== -1) {
             foods.splice(foodIdx, 1); pushNewFoodCell();
@@ -99,6 +138,18 @@ function updatePoison() {
 }
 
 function updateGame() {
+    // Обновление игрового времени (если игра активна)
+if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch &&
+    !startModal.classList.contains('active') && !phase2Modal.classList.contains('active') && !helpModal.classList.contains('active')) {
+    gameTime += performance.now() - lastTimeUpdate;
+    lastTimeUpdate = performance.now();
+    const totalSec = Math.floor(gameTime / 1000);
+    gameTimeSpan.textContent = totalSec;   // просто количество секунд
+} else {
+    lastTimeUpdate = performance.now();
+}
+    
+    if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || helpModal.classList.contains('active')) return;
     if (!gameRunning || paused) return;
     if (awaitingJailStart) return;
     if (jailCountdown) { updateCountdown(); return; }
@@ -110,13 +161,18 @@ function updateGame() {
         sanitationMilestoneReached = true;
         nextSanitationScore = 1500;
     }
-    if (sanitationMilestoneReached && score >= nextSanitationScore) {
-        sanitationCharges++;
-        nextSanitationScore += 500;
-    }
-// Обновление таймера голода
-const hungerRemaining = Math.max(0, Math.ceil((CONFIG.hungerTime - (performance.now() - lastAppleTime)) / 1000));
-hungerTimerSpan.textContent = hungerRemaining;
+  
+// Обновление полоски голода (чернеет сверху вниз)
+const remaining = Math.max(0, CONFIG.hungerTime - (performance.now() - lastAppleTime));
+const hungerFraction = remaining / CONFIG.hungerTime;   // 1 = полный, 0 = пустой
+hungerBarOverlay.style.height = ((1 - hungerFraction) * 100) + '%';  // чёрный растёт сверху
+
+if (isStarving) {
+    hungerBarBg.classList.add('starving');
+} else {
+    hungerBarBg.classList.remove('starving');
+}
+    
     prevVultures = vultures.map(v => ({...v}));
     updatePlayer();
     if (!worldDiscovered) updateBullet();
@@ -142,16 +198,7 @@ if (gameRunning && !awaitingHatch && !jailMode) {
     }
 }
     updateBabies();
-// Начисление зарядов санации
-if (!sanitationMilestoneReached && score >= 1000) {
-    sanitationCharges += 2;
-    sanitationMilestoneReached = true;
-    nextSanitationScore = 1500;   // следующий порог после первых 1000
-}
-if (sanitationMilestoneReached && score >= nextSanitationScore) {
-    sanitationCharges++;
-    nextSanitationScore += 500;   // каждые 500 очков
-}
+    
     vultureMoveCounter++;
     if (vultureMoveCounter >= CONFIG.vultureSpeedDivider) { updateVultures(); vultureMoveCounter = 0; }
 
@@ -186,9 +233,4 @@ function gameLoop(now) {
     drawGame(t, now);
     animationFrameId = requestAnimationFrame(gameLoop);
 }
-
-// Старт
-snake = [{x:10,y:10}]; prevSnake = [{x:10,y:10}];
-generateFoods();
-gameRunning = false; gameOverFlag = false;
-animationFrameId = requestAnimationFrame(ts => { drawGame(0, ts); animationFrameId = null; });
+startModal.classList.add('active');

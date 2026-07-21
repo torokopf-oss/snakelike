@@ -5,13 +5,30 @@ const scoreSpan = document.getElementById('scoreDisplay');
 const poopEatenSpan = document.getElementById('poopEatenDisplay');
 const highScoreSpan = document.getElementById('highScoreDisplay');
 const gameOverDiv = document.getElementById('gameOverText');
-const hungerTimerSpan = document.getElementById('hungerTimerDisplay');
+// Модальные окна
+const startModal = document.getElementById('startModal');
+const hungerBarBg = document.getElementById('hungerBarBg');
+const hungerBarOverlay = document.getElementById('hungerBarOverlay');
+const phase2Modal = document.getElementById('phase2Modal');
+const helpModal = document.getElementById('helpModal');
+const startButton = document.getElementById('startButton');
+const phase2Button = document.getElementById('phase2Button');
+const helpButton = document.getElementById('helpButton');
+const closeHelpButton = document.getElementById('closeHelpButton');
+const gameTimeSpan = document.getElementById('gameTimeDisplay');
+let worldDiscoveredDown = false;
+let gameTime = 0;                // прошедшее время активной игры (мс)
+let lastTimeUpdate = 0;          // момент последнего обновления счётчика времени
+const gameTimeDisplay = null;    // будет назначен позже
+
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
+let gameOverLines = [];
 let dir = { x: 0, y: 0 }, nextDir = { x: 0, y: 0 };
 let score = 0, highScore = 0;
 let gameRunning = false, gameOverFlag = false;
 let paused = false;
+let pauseStartTime = 0;
 let playerPoopsEaten = 0;
 let foods = [], prevFoods = [];
 let poops = [];
