@@ -59,13 +59,23 @@ function updateBabies() {
         }
         baby.unshift(newHead);
         const foodIdx = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
-        if (foodIdx !== -1) {
-            foods.splice(foodIdx, 1);
-            score += 2; scoreSpan.textContent = score; applesEaten++;
-            pushNewFoodCell();
-            if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
-            else baby.pop();
-        } else {
+
+    if (foodIdx !== -1) {
+    foods.splice(foodIdx, 1);
+    score += 2; scoreSpan.textContent = score; applesEaten++;
+    pushNewFoodCell();
+    if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
+    else baby.pop();
+    
+    // Оставляем какашку, как у игрока
+    if (applesEaten % 2 === 0) {
+        const babyTail = baby[baby.length - 1];
+        spawnPoopAt(babyTail, babyDirections[b]);
+        updateWarning(); // чтобы обновить предупреждение о Говноеде
+    }
+}
+        
+        else {
             baby.pop();
         }
         if (baby.length === 0) {
