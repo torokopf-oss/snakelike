@@ -1,6 +1,7 @@
 const CONFIG = {
     gridSize: 20,
-    fullWidth: 40, fullHeight: 20, viewWidth: 20,
+    fullWidth: 40, fullHeight: 40,     // ← полная высота 40!
+    viewWidth: 20, viewHeight: 20,     // ← начальная высота 20
     snakeSpeed: 160,
     babyThresholdForThirdPhase: 4,
     poisonPercent: 0.05,
@@ -10,6 +11,6 @@ const CONFIG = {
     countdownSeconds: 3,
     vultureSpeedDivider: 2, vultureThreshold: 5,
     eggCooldownMs: 35000,
-    hungerTime: 15000,               // 15 секунд до начала голода
-    hungerPenaltyPerSecond: 100      // минус 100 очков в секунду
+    hungerTime: 15000,
+    hungerPenaltyPerSecond: 100
 };
