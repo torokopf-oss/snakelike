@@ -121,7 +121,7 @@ function drawGame(t, now) {
         ctx.save();
         ctx.fillStyle = `rgba(255,80,0,${pulse*0.8})`; ctx.shadowBlur = 15; ctx.shadowColor = '#ff5000';
         if (spawnSide === 0) ctx.fillRect(0, 0, gw, maxY() * gs);
-        else if (spawnSide === 1) ctx.fillRect(0, 0, gw, maxY() * gs);
+        else if (spawnSide === 1) ctx.fillRect(canvas.width - gw, 0, gw, maxY() * gs);
         else if (spawnSide === 2) ctx.fillRect(0, 0, viewCells*gs, gw);
         else if (spawnSide === 3) ctx.fillRect(0, maxY() * gs - gw, viewCells*gs, gw);
         ctx.restore();
