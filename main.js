@@ -41,7 +41,7 @@ function resetGame() {
 
 function stopGame(msg) {
     const timeSec = Math.floor(gameTime / 1000);
-    const timeBonus = timeSec * 10;
+    const timeBonus = timeSec;
     const finalScore = score + timeBonus;
     const reason = msg || 'Игра окончена!';
     const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec}×10)`;
