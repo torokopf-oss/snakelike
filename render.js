@@ -114,7 +114,20 @@ function drawGame(t, now) {
         ctx.beginPath(); ctx.moveTo(wallX, 0); ctx.lineTo(wallX, maxY() * gs); ctx.stroke();
         ctx.restore();
     }
-
+// Нижняя граница для третьей фазы
+if (!worldDiscoveredDown && babySnakes.length >= CONFIG.babyThresholdForThirdPhase) {
+    const wallY = maxY() * gs;   // нижняя кромка видимой области (y = 20*gs = 400)
+    ctx.save();
+    ctx.strokeStyle = '#2ecc71';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#2ecc71';
+    ctx.beginPath();
+    ctx.moveTo(0, wallY);                // линия от левого края
+    ctx.lineTo(CONFIG.viewWidth * gs, wallY); // до правой границы начальной области (20 клеток)
+    ctx.stroke();
+    ctx.restore();
+}
     // Предупреждение о Говноеде
     if (warningActive && spawnSide !== -1) {
         const pulse = Math.sin(warningPulse)*0.4+0.6, gw = 20;
