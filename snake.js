@@ -9,7 +9,7 @@ function updatePlayer() {
 
     const head = snake[0];
     let newHead = { x: head.x + dir.x, y: head.y + dir.y };
-    const willEatVulture = vultures.some(v => v.x === newHead.x && v.y === newHead.y);
+    const willEatVulture = worldDiscoveredDown && vultures.some(v => v.x === newHead.x && v.y === newHead.y);
     // Пробитие правой стены (длина 30)
     if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < maxY()) {
         worldDiscovered = true;
