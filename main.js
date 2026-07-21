@@ -44,8 +44,7 @@ function stopGame(msg) {
     const timeBonus = timeSec;
     const finalScore = score + timeBonus;
     const reason = msg || 'Игра окончена!';
-    const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec}×10)`;
-
+const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec} сек)`;
     if (msg === 'Потомство уничтожено') {
         gameRunning = false; gameOverFlag = true;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
