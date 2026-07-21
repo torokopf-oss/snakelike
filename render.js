@@ -60,16 +60,25 @@ function generateFoods() {
     prevFoods = foods.map(f => ({...f}));
 }
 
-function spawnPoop() {
-    const tail = snake[snake.length - 1];
-    const d = dir.x || dir.y ? dir : { x: 1, y: 0 };
-    const behind = { x: tail.x - d.x, y: tail.y - d.y };
+function spawnPoopAt(tail, dir) {
+    const behind = { x: tail.x - dir.x, y: tail.y - dir.y };
     if (isCellFree(behind.x, behind.y)) { poops.push(behind); return; }
-    for (const nb of [{x:tail.x+1,y:tail.y},{x:tail.x-1,y:tail.y},{x:tail.x,y:tail.y+1},{x:tail.x,y:tail.y-1}]) {
+    for (const nb of [
+        {x: tail.x + 1, y: tail.y},
+        {x: tail.x - 1, y: tail.y},
+        {x: tail.x, y: tail.y + 1},
+        {x: tail.x, y: tail.y - 1}
+    ]) {
         if (isCellFree(nb.x, nb.y)) { poops.push(nb); return; }
     }
     const cell = randomFreeCell();
     if (cell) poops.push(cell);
+}
+
+function spawnPoop() {
+    const tail = snake[snake.length - 1];
+    const d = dir.x || dir.y ? dir : { x: 1, y: 0 };
+    spawnPoopAt(tail, d);
 }
 
 function spawnPill() {
