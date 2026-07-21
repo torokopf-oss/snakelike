@@ -60,16 +60,25 @@ function generateFoods() {
     prevFoods = foods.map(f => ({...f}));
 }
 
-function spawnPoop() {
-    const tail = snake[snake.length - 1];
-    const d = dir.x || dir.y ? dir : { x: 1, y: 0 };
-    const behind = { x: tail.x - d.x, y: tail.y - d.y };
+function spawnPoopAt(tail, dir) {
+    const behind = { x: tail.x - dir.x, y: tail.y - dir.y };
     if (isCellFree(behind.x, behind.y)) { poops.push(behind); return; }
-    for (const nb of [{x:tail.x+1,y:tail.y},{x:tail.x-1,y:tail.y},{x:tail.x,y:tail.y+1},{x:tail.x,y:tail.y-1}]) {
+    for (const nb of [
+        {x: tail.x + 1, y: tail.y},
+        {x: tail.x - 1, y: tail.y},
+        {x: tail.x, y: tail.y + 1},
+        {x: tail.x, y: tail.y - 1}
+    ]) {
         if (isCellFree(nb.x, nb.y)) { poops.push(nb); return; }
     }
     const cell = randomFreeCell();
     if (cell) poops.push(cell);
+}
+
+function spawnPoop() {
+    const tail = snake[snake.length - 1];
+    const d = dir.x || dir.y ? dir : { x: 1, y: 0 };
+    spawnPoopAt(tail, d);
 }
 
 function spawnPill() {
@@ -114,7 +123,20 @@ function drawGame(t, now) {
         ctx.beginPath(); ctx.moveTo(wallX, 0); ctx.lineTo(wallX, maxY() * gs); ctx.stroke();
         ctx.restore();
     }
-
+// Нижняя граница для третьей фазы
+if (!worldDiscoveredDown && babySnakes.length >= CONFIG.babyThresholdForThirdPhase) {
+    const wallY = maxY() * gs;   // нижняя кромка видимой области (y = 20*gs = 400)
+    ctx.save();
+    ctx.strokeStyle = '#2ecc71';
+    ctx.lineWidth = 3;
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#2ecc71';
+    ctx.beginPath();
+    ctx.moveTo(0, wallY);                // линия от левого края
+    ctx.lineTo(CONFIG.viewWidth * gs, wallY); // до правой границы начальной области (20 клеток)
+    ctx.stroke();
+    ctx.restore();
+}
     // Предупреждение о Говноеде
     if (warningActive && spawnSide !== -1) {
         const pulse = Math.sin(warningPulse)*0.4+0.6, gw = 20;

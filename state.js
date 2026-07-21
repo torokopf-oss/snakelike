@@ -33,6 +33,7 @@ let playerPoopsEaten = 0;
 let foods = [], prevFoods = [];
 let poops = [];
 let applesEaten = 0;
+let babyPoopCounter = 0;   // счётчик яблок, съеденных детёнышами
 let poisonActive = false, lastPoisonCheck = 0;
 let pill = null;
 let sickParticles = [];
