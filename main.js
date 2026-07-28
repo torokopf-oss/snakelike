@@ -6,6 +6,8 @@ function resetGame() {
     hungerBarBg.classList.remove('starving');
    
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    moveQueue = [];
+    jailMoveQueue = [];
     // Показываем стартовое окно
     phase2Modal.classList.remove('active');
     helpModal.classList.remove('active');

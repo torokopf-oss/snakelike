@@ -59,29 +59,31 @@ function updateBabies() {
         }
         baby.unshift(newHead);
         const foodIdx = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
+        if (foodIdx !== -1) {
+            foods.splice(foodIdx, 1);
+            score += 2;
+            scoreSpan.textContent = score;
+            applesEaten++;
+            pushNewFoodCell();
+            if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
+            else baby.pop();
 
-  if (foodIdx !== -1) {
-    foods.splice(foodIdx, 1);
-    score += 2; scoreSpan.textContent = score; applesEaten++;
-    pushNewFoodCell();
-    if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
-    else baby.pop();
-    
-    babyPoopCounter++;                     // увеличиваем счётчик яблок детёнышей
-    if (babyPoopCounter >= 3) {           // каждое третье яблоко
-        const babyTail = baby[baby.length - 1];
-        spawnPoopAt(babyTail, babyDirections[b]);
-        updateWarning();
-        babyPoopCounter = 0;              // сбрасываем
-    }
-}
-        
-        else {
+            // Правильная какашка: каждое 3-е яблоко, за хвостом конкретного детёныша
+            if (applesEaten % 3 === 0) {
+                const babyTail = baby[baby.length - 1];
+                spawnPoopAt(babyTail, babyDirections[b]);
+                updateWarning();
+            }
+        } else {
             baby.pop();
         }
         if (baby.length === 0) {
-            babySnakes.splice(b, 1); babyPrevSnakes.splice(b, 1); babyDirections.splice(b, 1);
+            babySnakes.splice(b, 1);
+            babyPrevSnakes.splice(b, 1);
+            babyDirections.splice(b, 1);
         }
     }
-    if (hadBabies && babySnakes.length === 0 && !egg && gameRunning && !awaitingHatch) stopGame('Потомство уничтожено');
+    if (hadBabies && babySnakes.length === 0 && !egg && gameRunning && !awaitingHatch) {
+        stopGame('Потомство уничтожено');
+    }
 }
