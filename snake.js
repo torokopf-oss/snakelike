@@ -4,12 +4,17 @@ function updatePlayer() {
     prevSnake = snake.map(s => ({...s}));
     prevFoods = foods.map(f => ({...f}));
 
-    if ((nextDir.x || nextDir.y) && !(nextDir.x === -dir.x && nextDir.y === -dir.y)) dir = nextDir;
+    // Извлекаем первый поворот из очереди, если есть
+    if (moveQueue.length > 0) {
+        dir = moveQueue.shift();
+    }
+    // Если очередь пуста, dir остаётся прежним (движение по инерции)
+
     if (!dir.x && !dir.y) return;
 
     const head = snake[0];
     let newHead = { x: head.x + dir.x, y: head.y + dir.y };
-    const willEatVulture = worldDiscoveredDown && vultures.some(v => v.x === newHead.x && v.y === newHead.y);
+
     // Пробитие правой стены (длина 30)
     if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < maxY()) {
         worldDiscovered = true;
@@ -37,7 +42,7 @@ function updatePlayer() {
         phase2Modal.classList.add('active');
     }
 
-    // Пробитие нижней стены (4+ детёнышей)
+    // Пробитие нижней стены (5+ детёнышей)
     if (!worldDiscoveredDown && babySnakes.length >= CONFIG.babyThresholdForThirdPhase &&
         newHead.y === CONFIG.viewHeight && newHead.x >= 0 && newHead.x < maxX()) {
         worldDiscoveredDown = true;
@@ -52,6 +57,7 @@ function updatePlayer() {
     const willEatFood = foods.some(f => f.x === newHead.x && f.y === newHead.y);
     const willEatPoop = poops.some(p => p.x === newHead.x && p.y === newHead.y);
     const willEatPill = pill && pill.x === newHead.x && pill.y === newHead.y;
+    const willEatVulture = worldDiscoveredDown && vultures.some(v => v.x === newHead.x && v.y === newHead.y);
     const bodyToCheck = (willEatFood || willEatPoop || willEatPill || willEatVulture) ? snake : snake.slice(0, -1);
     if (bodyToCheck.some(seg => seg.x === newHead.x && seg.y === newHead.y)) { stopGame(); return; }
 
@@ -87,15 +93,13 @@ function updatePlayer() {
     } else if (willEatPill) {
         snake.unshift(newHead); snake.pop();
         pill = null; poisonActive = false;
-        } else if (ateApple) {
+    } else if (ateApple) {
+        const oldTail = snake[snake.length - 1];
+        snake.unshift(newHead); prevSnake.push({ ...oldTail });
+    } else if (willEatVulture) {
         const oldTail = snake[snake.length - 1];
         snake.unshift(newHead);
         prevSnake.push({ ...oldTail });
-    } else if (willEatVulture) {
-        // поедание стервятника
-        const oldTail = snake[snake.length - 1];
-        snake.unshift(newHead);
-        prevSnake.push({ ...oldTail });   // удлинение без потери хвоста
         score += 50;
         scoreSpan.textContent = score;
         const vIdx = vultures.findIndex(v => v.x === newHead.x && v.y === newHead.y);
@@ -104,8 +108,7 @@ function updatePlayer() {
             prevVultures.splice(vIdx, 1);
         }
     } else {
-        snake.unshift(newHead);
-        snake.pop();
+        snake.unshift(newHead); snake.pop();
         foods.forEach(f => moveFoodLazy(f));
     }
     if (eggCooldown > 0) eggCooldown--;
@@ -150,8 +153,9 @@ function hatchPlayerFromEgg() {
     score = Math.floor(score * 2 / 3);
     scoreSpan.textContent = score;
     snake = [{ ...egg }]; prevSnake = [{ ...egg }];
-    dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 };
+    dir = { x: 1, y: 0 };
     egg = null; awaitingHatch = false; gameRunning = true; gameOverFlag = false; gameOverDiv.textContent = '';
+    moveQueue = []; // очищаем очередь после вылупления
 }
 
 function spawnBabyFromEgg() {
@@ -168,12 +172,13 @@ function spawnBabyFromEgg() {
 
 function activateCheats() {
     if (!gameRunning) return;
+    moveQueue = []; // сбрасываем очередь
     if (!worldDiscovered) {
         const head = { x: 19, y: 10 };
         snake = [head];
         for (let i = 1; i < 41; i++) snake.push({ x: head.x - i, y: head.y });
         prevSnake = snake.map(s => ({...s}));
-        dir = { x: 1, y: 0 }; nextDir = { x: 1, y: 0 };
+        dir = { x: 1, y: 0 };
         egg = {
             x: Math.floor(Math.random() * CONFIG.viewWidth),
             y: Math.floor(Math.random() * maxY())
