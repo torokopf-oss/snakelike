@@ -37,6 +37,7 @@ function resetGame() {
     isStarving = false;
     lastHungerTick = 0;
     babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
+    babyFleeing = [];
     vultures = []; prevVultures = []; vulturesPerWave = 1; vultureMoveCounter = 0;
     generateFoods();
     lastUpdateTime = performance.now();
