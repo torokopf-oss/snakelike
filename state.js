@@ -63,6 +63,7 @@ let egg = null, eggCooldown = 0;
 let firstEggLaid = false, eggAppleCounter = 0;
 let lastEggTime = 0;  
 let babySnakes = [], babyPrevSnakes = [], babyDirections = [];
+let babyFleeing = [];   // true, если детёныш убегает к границе после укуса
 let awaitingHatch = false;
 let hadBabies = false;
 
