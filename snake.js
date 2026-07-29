@@ -146,6 +146,16 @@ if (manaBarBg) {
             applesEaten++;
             score += 10 + snake.length;
             scoreSpan.textContent = score;
+            mana = Math.min(mana + 10, MAX_MANA);
+console.log('mana after eat:', mana, 'max:', MAX_MANA, 'manaBarBg:', manaBarBg);
+manaSpan.textContent = mana;
+if (manaBarBg) {
+    const percent = (mana / MAX_MANA) * 100;
+    console.log('setting mana bar to', percent + '%');
+    manaBarBg.style.height = percent + '%';
+} else {
+    console.error('manaBarBg is null!');
+}
             snake[snake.length - 1].glowUntil = performance.now() + 500;
             break;
         }
