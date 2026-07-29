@@ -17,6 +17,12 @@ window.addEventListener('keydown', e => {
         }
         return;
     }
+    if (cannibalModal.classList.contains('active')) {
+    if (e.code === 'Space') {
+        cannibalModal.classList.remove('active');
+    }
+    return;
+}
     if (helpModal.classList.contains('active')) {
         if (e.code === 'Space' || e.code === 'KeyH') {
             helpModal.classList.remove('active');
@@ -31,18 +37,20 @@ window.addEventListener('keydown', e => {
     }
 
     // Пауза
-    if (e.code === 'KeyP') {
-        if (gameRunning && !gameOverFlag && !awaitingHatch && !jailMode && !jailCountdown) {
-            paused = !paused;
-            if (paused) {
-                pauseStartTime = performance.now();
-            } else {
-                lastAppleTime += performance.now() - pauseStartTime;
-                lastUpdateTime = performance.now();
-            }
+ if (e.code === 'KeyP') {
+    if (gameRunning && !gameOverFlag && !awaitingHatch && !jailMode && !jailCountdown) {
+        paused = !paused;
+        if (paused) {
+            pauseStartTime = performance.now();
+        } else {
+            const pauseDuration = performance.now() - pauseStartTime;
+            lastAppleTime += pauseDuration;
+            lastTimeUpdate += pauseDuration;   // ← чтобы gameTime не учитывал паузу
+            lastUpdateTime = performance.now();
         }
-        return;
     }
+    return;
+}
 
     // Пробел (обычная игра)
     if (e.code === 'Space') {
@@ -62,7 +70,7 @@ window.addEventListener('keydown', e => {
     if (e.code === 'KeyX') {
         if (awaitingHatch) { hatchPlayerFromEgg(); return; }
         if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
-        const canLay = gameRunning && snake.length >= 25 && !egg
+        const canLay = gameRunning && snake.length >= 20 && !egg
                        && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
                        && !awaitingJailStart && !jailMode;
         if (canLay) {

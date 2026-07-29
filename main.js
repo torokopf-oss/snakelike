@@ -37,6 +37,7 @@ function resetGame() {
     isStarving = false;
     lastHungerTick = 0;
     babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
+    babyFleeing = [];
     vultures = []; prevVultures = []; vulturesPerWave = 1; vultureMoveCounter = 0;
     generateFoods();
     lastUpdateTime = performance.now();
@@ -151,7 +152,7 @@ if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch 
     lastTimeUpdate = performance.now();
 }
     
-    if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || helpModal.classList.contains('active')) return;
+    if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || cannibalModal.classList.contains('active') || helpModal.classList.contains('active')) return;
     if (!gameRunning || paused) return;
     if (awaitingJailStart) return;
     if (jailCountdown) { updateCountdown(); return; }

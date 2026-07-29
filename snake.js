@@ -48,12 +48,81 @@ function updatePlayer() {
         worldDiscoveredDown = true;
         canvas.height = CONFIG.fullHeight * CONFIG.gridSize;
         generateFoods();
+        cannibalModal.classList.add('active');
     }
 
     if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= maxY()) { stopGame(); return; }
 
     if (poopSnakeActive && poopSnake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) { stopGame('Вас сожрал Говноед!'); return; }
-
+// В третьей фазе игрок и детёныши могут поедать друг друга
+if (worldDiscoveredDown) {
+    let babyBiteInfo = null;
+    for (let b = 0; b < babySnakes.length; b++) {
+        const baby = babySnakes[b];
+        if (!baby) continue;
+        const idx = baby.findIndex(seg => seg.x === newHead.x && seg.y === newHead.y);
+        if (idx !== -1) {
+            babyBiteInfo = { b, idx, isHead: idx === 0 };
+            break;
+        }
+    }
+    if (babyBiteInfo) {
+        if (babyBiteInfo.isHead) {
+            // Столкновение голова-в-голову
+            if (snake.length <= 1) {
+                stopGame('Вас убил детёныш!');
+                return;
+            }
+            // Превращаем всего детёныша в яблоки
+            const baby = babySnakes[babyBiteInfo.b];
+            for (const seg of baby) {
+                // Очищаем клетку от других объектов
+                const fi = foods.findIndex(f => f.x === seg.x && f.y === seg.y);
+                if (fi !== -1) foods.splice(fi, 1);
+                const pi = poops.findIndex(p => p.x === seg.x && p.y === seg.y);
+                if (pi !== -1) poops.splice(pi, 1);
+                if (pill && pill.x === seg.x && pill.y === seg.y) pill = null;
+                if (egg && egg.x === seg.x && egg.y === seg.y) egg = null;
+                foods.push({ x: seg.x, y: seg.y });
+            }
+            prevFoods = foods.map(f => ({...f}));
+            // Удаляем детёныша
+            babySnakes.splice(babyBiteInfo.b, 1);
+            babyPrevSnakes.splice(babyBiteInfo.b, 1);
+            babyDirections.splice(babyBiteInfo.b, 1);
+            babyFleeing.splice(babyBiteInfo.b, 1);
+            score += 50;
+            scoreSpan.textContent = score;
+            // Ход продолжается: newHead теперь указывает на яблоко (бывшую голову)
+        } else {
+            // Игрок съедает сегмент тела детёныша
+            const baby = babySnakes[babyBiteInfo.b];
+            const oldTail = snake[snake.length - 1];
+            snake.unshift(newHead);
+            prevSnake.push({ ...oldTail });   // игрок растёт на 1 клетку
+            // Уменьшаем детёныша
+            if (baby.length <= 1) {
+                babySnakes.splice(babyBiteInfo.b, 1);
+                babyPrevSnakes.splice(babyBiteInfo.b, 1);
+                babyDirections.splice(babyBiteInfo.b, 1);
+                babyFleeing.splice(babyBiteInfo.b, 1);
+            } else {
+                baby.pop();
+            }
+            // Убираем возможные объекты с клетки newHead
+            const fi = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
+            if (fi !== -1) foods.splice(fi, 1);
+            const pi = poops.findIndex(p => p.x === newHead.x && p.y === newHead.y);
+            if (pi !== -1) poops.splice(pi, 1);
+            if (pill && pill.x === newHead.x && pill.y === newHead.y) pill = null;
+            if (egg && egg.x === newHead.x && egg.y === newHead.y) egg = null;
+            score += 20;
+            scoreSpan.textContent = score;
+            if (eggCooldown > 0) eggCooldown--;
+            return; // ход завершён, змейка уже сдвинулась
+        }
+    }
+}
     const willEatFood = foods.some(f => f.x === newHead.x && f.y === newHead.y);
     const willEatPoop = poops.some(p => p.x === newHead.x && p.y === newHead.y);
     const willEatPill = pill && pill.x === newHead.x && pill.y === newHead.y;
@@ -155,7 +224,10 @@ function hatchPlayerFromEgg() {
     snake = [{ ...egg }]; prevSnake = [{ ...egg }];
     dir = { x: 1, y: 0 };
     egg = null; awaitingHatch = false; gameRunning = true; gameOverFlag = false; gameOverDiv.textContent = '';
-    moveQueue = []; // очищаем очередь после вылупления
+    moveQueue = [];
+    lastAppleTime = performance.now();   // сброс таймера голода
+    isStarving = false;                  // убираем флаг голодания
+    lastHungerTick = 0;                  // сброс счётчика штрафных секунд
 }
 
 function spawnBabyFromEgg() {
