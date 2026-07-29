@@ -139,6 +139,7 @@ closeAbilitiesButton.addEventListener('click', () => {
 function activateAbility(slot) {
     if (!gameRunning || paused || jailMode || jailCountdown || awaitingHatch || awaitingJailStart) return;
     const ability = equippedAbilities[slot];
+    window.activateAbility = activateAbility;
     if (!ability) return;
     if (performance.now() < abilityCooldowns[slot]) return;   // кулдаун
     if (mana < ability.cost) return;
