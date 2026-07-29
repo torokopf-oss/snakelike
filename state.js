@@ -9,16 +9,17 @@ const gameOverDiv = document.getElementById('gameOverText');
 const startModal = document.getElementById('startModal');
 const hungerBarBg = document.getElementById('hungerBarBg');
 const hungerBarOverlay = document.getElementById('hungerBarOverlay');
-const manaSpan = document.getElementById('manaDisplay');
-const manaBarBg = document.getElementById('manaBarBg');
 const phase2Modal = document.getElementById('phase2Modal');
 const helpModal = document.getElementById('helpModal');
 const startButton = document.getElementById('startButton');
 const phase2Button = document.getElementById('phase2Button');
-const cannibalModal = document.getElementById('cannibalModal');
-const cannibalButton = document.getElementById('cannibalButton');
 const helpButton = document.getElementById('helpButton');
 const closeHelpButton = document.getElementById('closeHelpButton');
+const gameTimeSpan = document.getElementById('gameTimeDisplay');
+const cannibalModal = document.getElementById('cannibalModal');
+const cannibalButton = document.getElementById('cannibalButton');
+const manaSpan = document.getElementById('manaDisplay');
+const manaBarBg = document.getElementById('manaBarBg');
 const abilitiesButton = document.getElementById('abilitiesButton');
 const abilitiesModal = document.getElementById('abilitiesModal');
 const abilitiesList = document.getElementById('abilitiesList');
@@ -28,11 +29,11 @@ const abilitySlots = [
     document.getElementById('abilitySlot2'),
     document.getElementById('abilitySlot3')
 ];
-const gameTimeSpan = document.getElementById('gameTimeDisplay');
+
 let worldDiscoveredDown = false;
-let gameTime = 0;                // прошедшее время активной игры (мс)
-let lastTimeUpdate = 0;          // момент последнего обновления счётчика времени
-const gameTimeDisplay = null;    // будет назначен позже
+let gameTime = 0;
+let lastTimeUpdate = 0;
+const gameTimeDisplay = null;
 
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
@@ -40,10 +41,6 @@ let gameOverLines = [];
 let dir = { x: 0, y: 0 };
 let score = 0, highScore = 0;
 let mana = 0;
-const MAX_MANA = 100;
-let equippedAbilities = [null, null, null];   // три слота, пока доступен только 0
-let abilityCooldowns = [0, 0, 0];             // время окончания кулдауна для каждого слота (performance.now())
-let tailSegments = [];                        // сброшенные сегменты хвоста {x, y, life}
 const MAX_MANA = 100;
 let gameRunning = false, gameOverFlag = false;
 let paused = false;
@@ -55,9 +52,9 @@ let applesEaten = 0;
 let poisonActive = false, lastPoisonCheck = 0;
 let pill = null;
 let sickParticles = [];
-let lastAppleTime = 0;           // время последнего съеденного яблока
-let isStarving = false;          // флаг голода
-let lastHungerTick = 0;          // для точного штрафа по секундам
+let lastAppleTime = 0;
+let isStarving = false;
+let lastHungerTick = 0;
 let poopSnake = [], prevPoopSnake = [];
 let poopSnakeActive = false, poopSnakeDir = { x: 0, y: 0 };
 let poopSnakeNextThreshold = CONFIG.poopThresholdStart;
@@ -80,9 +77,9 @@ let worldDiscovered = false;
 
 let egg = null, eggCooldown = 0;
 let firstEggLaid = false, eggAppleCounter = 0;
-let lastEggTime = 0;  
+let lastEggTime = 0;
 let babySnakes = [], babyPrevSnakes = [], babyDirections = [];
-let babyFleeing = [];   // true, если детёныш убегает к границе после укуса
+let babyFleeing = [];
 let awaitingHatch = false;
 let hadBabies = false;
 
@@ -94,9 +91,14 @@ let flashStart = 0;
 const FLASH_DURATION = 300;
 const LASER_DURATION = 200;
 
-// Очереди поворотов (макс. длина 2)
+// Очереди поворотов
 let moveQueue = [];
 let jailMoveQueue = [];
+
+// Способности
+let equippedAbilities = [null, null, null];
+let abilityCooldowns = [0, 0, 0];
+let tailSegments = [];
 
 let lastUpdateTime = 0, animationFrameId = null;
 
