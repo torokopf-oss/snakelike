@@ -93,6 +93,9 @@ if (worldDiscoveredDown) {
             babyFleeing.splice(babyBiteInfo.b, 1);
             score += 50;
             scoreSpan.textContent = score;
+            mana = Math.min(mana + 10, MAX_MANA);
+            manaSpan.textContent = mana;
+            updateManaBar();
             // Ход продолжается: newHead теперь указывает на яблоко (бывшую голову)
         } else {
             // Игрок съедает сегмент тела детёныша
