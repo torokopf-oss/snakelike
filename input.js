@@ -37,18 +37,20 @@ window.addEventListener('keydown', e => {
     }
 
     // Пауза
-    if (e.code === 'KeyP') {
-        if (gameRunning && !gameOverFlag && !awaitingHatch && !jailMode && !jailCountdown) {
-            paused = !paused;
-            if (paused) {
-                pauseStartTime = performance.now();
-            } else {
-                lastAppleTime += performance.now() - pauseStartTime;
-                lastUpdateTime = performance.now();
-            }
+ if (e.code === 'KeyP') {
+    if (gameRunning && !gameOverFlag && !awaitingHatch && !jailMode && !jailCountdown) {
+        paused = !paused;
+        if (paused) {
+            pauseStartTime = performance.now();
+        } else {
+            const pauseDuration = performance.now() - pauseStartTime;
+            lastAppleTime += pauseDuration;
+            lastTimeUpdate += pauseDuration;   // ← чтобы gameTime не учитывал паузу
+            lastUpdateTime = performance.now();
         }
-        return;
     }
+    return;
+}
 
     // Пробел (обычная игра)
     if (e.code === 'Space') {
