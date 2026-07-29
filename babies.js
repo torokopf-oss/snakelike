@@ -9,7 +9,7 @@ function updateBabies() {
         // ---------- Приоритет 0: избегание Говноеда (любого сегмента) ----------
         let poopFleeTarget = null;
         if (poopSnakeActive && poopSnake.length > 0) {
-            let minDist = 5;   // радиус срабатывания
+            let minDist = 5;
             for (const seg of poopSnake) {
                 const d = Math.abs(seg.x - head.x) + Math.abs(seg.y - head.y);
                 if (d < minDist) {
@@ -19,19 +19,16 @@ function updateBabies() {
             }
         }
         if (poopFleeTarget) {
-            // Убегаем от ближайшего сегмента Говноеда
             const dx = head.x - poopFleeTarget.x;
             const dy = head.y - poopFleeTarget.y;
             if (Math.abs(dx) > Math.abs(dy)) desiredDir.x = dx > 0 ? 1 : -1;
             else if (dy !== 0) desiredDir.y = dy > 0 ? 1 : -1;
             else desiredDir.x = dx > 0 ? 1 : -1;
-            // после вычисления desiredDir пропускаем все остальные цели
         } else {
             // ---------- Основная логика в зависимости от фазы ----------
             if (worldDiscoveredDown) {
                 // Третья фаза
                 if (babyFleeing[b] && babyFleeing[b].active) {
-                    // Бегство к границе после укуса
                     const target = babyFleeing[b];
                     const dx = target.tx - head.x;
                     const dy = target.ty - head.y;
@@ -39,7 +36,6 @@ function updateBabies() {
                     else if (dy !== 0) desiredDir.y = dy > 0 ? 1 : -1;
                     else desiredDir.x = dx > 0 ? 1 : -1;
                 } else {
-                    // Охота на тело игрока или патрулирование
                     let biteTarget = null;
                     if (snake.length > 1) {
                         let minDist = Infinity;
@@ -59,7 +55,6 @@ function updateBabies() {
                         else if (dy !== 0) desiredDir.y = dy > 0 ? 1 : -1;
                         else desiredDir.x = dx > 0 ? 1 : -1;
                     } else {
-                        // Нет тела – ищем еду
                         let targetFood = null, minDist = Infinity;
                         for (const f of foods) {
                             const d = Math.abs(f.x - head.x) + Math.abs(f.y - head.y);
@@ -76,10 +71,8 @@ function updateBabies() {
                     }
                 }
             } else {
-                // Первая/вторая фаза (старая логика)
+                // Первая/вторая фаза
                 let fleeTarget = null;
-                // Приоритет: Говноед (уже проверен выше, сюда не попали)
-                // Проверяем стервятников
                 for (const v of vultures) {
                     const d = Math.abs(v.x - head.x) + Math.abs(v.y - head.y);
                     if (d < 6) { fleeTarget = v; break; }
@@ -118,15 +111,13 @@ function updateBabies() {
         const outOfBounds = newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= maxY();
         if (outOfBounds) {
             if (babyFleeing[b] && babyFleeing[b].active) {
-                // Достигли границы при бегстве – сбрасываем бегство
                 babyFleeing[b] = { active: false };
             }
             babyDirections[b] = { x: -desiredDir.x, y: -desiredDir.y };
             newHead = { x: head.x + babyDirections[b].x, y: head.y + babyDirections[b].y };
-            // Если после разворота снова граница – детёныш исчезнет при следующем шаге, это нормально
         }
 
-        // ---------- Столкновение с Говноедом (гибель) ----------
+        // ---------- Столкновение с Говноедом ----------
         if (poopSnakeActive && poopSnake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
             babySnakes.splice(b, 1); babyPrevSnakes.splice(b, 1); babyDirections.splice(b, 1);
             babyFleeing.splice(b, 1);
@@ -135,14 +126,13 @@ function updateBabies() {
 
         // ---------- Столкновение с головой игрока в третьей фазе ----------
         if (worldDiscoveredDown && snake.length > 0 && snake[0].x === newHead.x && snake[0].y === newHead.y) {
-            // Детёныш врезался в голову игрока – обрабатывается в updatePlayer (игрок убивает детёныша)
-            // Здесь просто удаляем детёныша, чтобы не мешать. Игрок в updatePlayer превратит его в яблоки.
+            // Обрабатывается в updatePlayer, здесь просто удаляем
             babySnakes.splice(b, 1); babyPrevSnakes.splice(b, 1); babyDirections.splice(b, 1);
             babyFleeing.splice(b, 1);
             continue;
         }
 
-        // ---------- Укус тела игрока (только в третьей фазе) ----------
+        // ---------- Укус тела игрока (третья фаза) ----------
         if (worldDiscoveredDown) {
             let biteIndex = -1;
             for (let i = 1; i < snake.length; i++) {
@@ -164,13 +154,11 @@ function updateBabies() {
                 snake.pop();
                 prevSnake.pop();
 
-                // Очистка клетки
                 const fi = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
                 if (fi !== -1) foods.splice(fi, 1);
                 const pi = poops.findIndex(p => p.x === newHead.x && p.y === newHead.y);
                 if (pi !== -1) poops.splice(pi, 1);
 
-                // Вычисляем самую удалённую границу для бегства
                 const dists = [
                     { d: head.x + 1, tx: -1, ty: head.y },
                     { d: maxX() - head.x, tx: maxX(), ty: head.y },
@@ -190,7 +178,33 @@ function updateBabies() {
             }
         }
 
-        // ---------- Обычное движение (нет укуса) ----------
+        // ---------- Универсальная проверка: нельзя заходить на клетку змейки ----------
+        if (snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
+            // Пытаемся объехать (перпендикулярные направления)
+            const alts = desiredDir.x !== 0
+                ? [{ x: 0, y: 1 }, { x: 0, y: -1 }]
+                : [{ x: 1, y: 0 }, { x: -1, y: 0 }];
+            let moved = false;
+            for (const alt of alts) {
+                if (alt.x === -babyDirections[b].x && alt.y === -babyDirections[b].y) continue;
+                const altHead = { x: head.x + alt.x, y: head.y + alt.y };
+                if (altHead.x < 0 || altHead.x >= maxX() || altHead.y < 0 || altHead.y >= maxY()) continue;
+                if (poopSnakeActive && poopSnake.some(seg => seg.x === altHead.x && seg.y === altHead.y)) continue;
+                if (snake.some(seg => seg.x === altHead.x && seg.y === altHead.y)) continue;
+                // Применяем альтернативу
+                desiredDir = alt;
+                babyDirections[b] = alt;
+                newHead = altHead;
+                moved = true;
+                break;
+            }
+            if (!moved) {
+                // Не можем сдвинуться — пропускаем ход
+                continue;
+            }
+        }
+
+        // ---------- Обычное движение ----------
         baby.unshift(newHead);
         const foodIdx = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
         if (foodIdx !== -1) {
@@ -199,7 +213,6 @@ function updateBabies() {
             pushNewFoodCell();
             if (baby.length < 4) baby.push({ ...baby[baby.length - 1] });
             else baby.pop();
-            // Какашка каждое 3-е яблоко
             if (applesEaten % 3 === 0) {
                 const babyTail = baby[baby.length - 1];
                 spawnPoopAt(babyTail, babyDirections[b]);
@@ -209,7 +222,6 @@ function updateBabies() {
             baby.pop();
         }
 
-        // Если детёныш исчез
         if (baby.length === 0) {
             babySnakes.splice(b, 1); babyPrevSnakes.splice(b, 1); babyDirections.splice(b, 1);
             babyFleeing.splice(b, 1);
