@@ -224,7 +224,10 @@ function hatchPlayerFromEgg() {
     snake = [{ ...egg }]; prevSnake = [{ ...egg }];
     dir = { x: 1, y: 0 };
     egg = null; awaitingHatch = false; gameRunning = true; gameOverFlag = false; gameOverDiv.textContent = '';
-    moveQueue = []; // очищаем очередь после вылупления
+    moveQueue = [];
+    lastAppleTime = performance.now();   // сброс таймера голода
+    isStarving = false;                  // убираем флаг голодания
+    lastHungerTick = 0;                  // сброс счётчика штрафных секунд
 }
 
 function spawnBabyFromEgg() {
