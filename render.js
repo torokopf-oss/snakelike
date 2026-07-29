@@ -172,7 +172,7 @@ function drawGame(t, now) {
         ctx.restore();
     }
 
-    const canLayEgg = gameRunning && snake.length >= 25 && !egg &&
+    const canLayEgg = gameRunning && snake.length >= 20 && !egg &&
         (performance.now() - lastEggTime >= CONFIG.eggCooldownMs) &&
         !awaitingJailStart && !jailMode;
     const headCol = poisonActive ? '#2ecc71' : (canLayEgg ? '#f1c40f' : '#e94560');
