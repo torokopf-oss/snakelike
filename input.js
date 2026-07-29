@@ -70,7 +70,7 @@ window.addEventListener('keydown', e => {
     if (e.code === 'KeyX') {
         if (awaitingHatch) { hatchPlayerFromEgg(); return; }
         if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
-        const canLay = gameRunning && snake.length >= 25 && !egg
+        const canLay = gameRunning && snake.length >= 20 && !egg
                        && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
                        && !awaitingJailStart && !jailMode;
         if (canLay) {
