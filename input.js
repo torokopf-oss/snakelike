@@ -65,7 +65,10 @@ window.addEventListener('keydown', e => {
         if (!gameRunning && !awaitingHatch) { resetGame(); return; }
         return;
     }
-
+if (e.code === 'KeyA') {
+    activateAbility(0);
+    return;
+}
     // Яйцо / вылупление
     if (e.code === 'KeyX') {
         if (awaitingHatch) { hatchPlayerFromEgg(); return; }
