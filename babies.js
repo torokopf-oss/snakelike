@@ -227,5 +227,7 @@ function updateBabies() {
         }
     }
 
-    if (hadBabies && babySnakes.length === 0 && !egg && gameRunning && !awaitingHatch) stopGame('Потомство уничтожено');
+if (hadBabies && babySnakes.length === 0 && !egg && gameRunning && !awaitingHatch && !worldDiscoveredDown) {
+    stopGame('Потомство уничтожено');
+}
 }
