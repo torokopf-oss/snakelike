@@ -9,7 +9,7 @@ window.addEventListener('keydown', e => {
         if (e.code === 'Space') {
             startGameFromModal();
         }
-        return; // не даём игре реагировать
+        return;
     }
     if (phase2Modal.classList.contains('active')) {
         if (e.code === 'Space') {
@@ -17,6 +17,12 @@ window.addEventListener('keydown', e => {
         }
         return;
     }
+    if (cannibalModal.classList.contains('active')) {
+    if (e.code === 'Space') {
+        cannibalModal.classList.remove('active');
+    }
+    return;
+}
     if (helpModal.classList.contains('active')) {
         if (e.code === 'Space' || e.code === 'KeyH') {
             helpModal.classList.remove('active');
@@ -31,13 +37,15 @@ window.addEventListener('keydown', e => {
     }
 
     // Пауза
-   if (e.code === 'KeyP') {
+ if (e.code === 'KeyP') {
     if (gameRunning && !gameOverFlag && !awaitingHatch && !jailMode && !jailCountdown) {
         paused = !paused;
         if (paused) {
             pauseStartTime = performance.now();
         } else {
-            lastAppleTime += performance.now() - pauseStartTime;
+            const pauseDuration = performance.now() - pauseStartTime;
+            lastAppleTime += pauseDuration;
+            lastTimeUpdate += pauseDuration;   // ← чтобы gameTime не учитывал паузу
             lastUpdateTime = performance.now();
         }
     }
@@ -62,7 +70,7 @@ window.addEventListener('keydown', e => {
     if (e.code === 'KeyX') {
         if (awaitingHatch) { hatchPlayerFromEgg(); return; }
         if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
-        const canLay = gameRunning && snake.length >= 25 && !egg
+        const canLay = gameRunning && snake.length >= 20 && !egg
                        && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
                        && !awaitingJailStart && !jailMode;
         if (canLay) {
@@ -91,10 +99,14 @@ window.addEventListener('keydown', e => {
 
     // Управление в тюрьме
     if (jailMode) {
-        if (e.code === 'ArrowUp' && jailDir.y !== 1) jailNextDir = {x:0,y:-1};
-        else if (e.code === 'ArrowDown' && jailDir.y !== -1) jailNextDir = {x:0,y:1};
-        else if (e.code === 'ArrowLeft' && jailDir.x !== 1) jailNextDir = {x:-1,y:0};
-        else if (e.code === 'ArrowRight' && jailDir.x !== -1) jailNextDir = {x:1,y:0};
+        const newDir = getDirectionFromCode(e.code);
+        if (!newDir) return;
+        // Проверяем последнее направление в очереди (или jailDir, если очередь пуста)
+        const lastQueued = jailMoveQueue.length > 0 ? jailMoveQueue[jailMoveQueue.length - 1] : jailDir;
+        // Запрет разворота и дублирования
+        if (!isOpposite(newDir, lastQueued) && !isSameDirection(newDir, lastQueued) && jailMoveQueue.length < 2) {
+            jailMoveQueue.push(newDir);
+        }
         return;
     }
 
@@ -111,11 +123,31 @@ window.addEventListener('keydown', e => {
         return;
     }
 
-    // Направления движения
-    switch (e.code) {
-        case 'ArrowUp':    nextDir = {x:0,y:-1}; break;
-        case 'ArrowDown':  nextDir = {x:0,y:1}; break;
-        case 'ArrowLeft':  nextDir = {x:-1,y:0}; break;
-        case 'ArrowRight': nextDir = {x:1,y:0}; break;
+    // Основное движение — добавляем в очередь
+    const newDir = getDirectionFromCode(e.code);
+    if (!newDir) return;
+    const lastQueued = moveQueue.length > 0 ? moveQueue[moveQueue.length - 1] : dir;
+    // Проверки: не противоположное, не такое же, не превышаем лимит очереди (2)
+    if (!isOpposite(newDir, lastQueued) && !isSameDirection(newDir, lastQueued) && moveQueue.length < 2) {
+        moveQueue.push(newDir);
     }
 });
+
+// Вспомогательные функции направлений
+function getDirectionFromCode(code) {
+    switch (code) {
+        case 'ArrowUp':    return { x: 0, y: -1 };
+        case 'ArrowDown':  return { x: 0, y: 1 };
+        case 'ArrowLeft':  return { x: -1, y: 0 };
+        case 'ArrowRight': return { x: 1, y: 0 };
+        default: return null;
+    }
+}
+
+function isOpposite(dir1, dir2) {
+    return dir1.x === -dir2.x && dir1.y === -dir2.y;
+}
+
+function isSameDirection(dir1, dir2) {
+    return dir1.x === dir2.x && dir1.y === dir2.y;
+}

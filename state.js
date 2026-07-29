@@ -13,6 +13,8 @@ const phase2Modal = document.getElementById('phase2Modal');
 const helpModal = document.getElementById('helpModal');
 const startButton = document.getElementById('startButton');
 const phase2Button = document.getElementById('phase2Button');
+const cannibalModal = document.getElementById('cannibalModal');
+const cannibalButton = document.getElementById('cannibalButton');
 const helpButton = document.getElementById('helpButton');
 const closeHelpButton = document.getElementById('closeHelpButton');
 const gameTimeSpan = document.getElementById('gameTimeDisplay');
@@ -24,7 +26,7 @@ const gameTimeDisplay = null;    // будет назначен позже
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
 let gameOverLines = [];
-let dir = { x: 0, y: 0 }, nextDir = { x: 0, y: 0 };
+let dir = { x: 0, y: 0 };
 let score = 0, highScore = 0;
 let gameRunning = false, gameOverFlag = false;
 let paused = false;
@@ -33,7 +35,6 @@ let playerPoopsEaten = 0;
 let foods = [], prevFoods = [];
 let poops = [];
 let applesEaten = 0;
-let babyPoopCounter = 0;   // счётчик яблок, съеденных детёнышами
 let poisonActive = false, lastPoisonCheck = 0;
 let pill = null;
 let sickParticles = [];
@@ -52,7 +53,7 @@ let sanitationCharges = 0;
 let nextSanitationScore = 1000;
 let sanitationMilestoneReached = false;
 let jailMode = false, jailSnake = [], jailPrevSnake = [];
-let jailDir = { x: 0, y: 0 }, jailNextDir = { x: 0, y: 0 };
+let jailDir = { x: 0, y: 0 };
 let jailStartTime = 0;
 let awaitingJailStart = false;
 let awaitingJailReason = '';
@@ -64,6 +65,7 @@ let egg = null, eggCooldown = 0;
 let firstEggLaid = false, eggAppleCounter = 0;
 let lastEggTime = 0;  
 let babySnakes = [], babyPrevSnakes = [], babyDirections = [];
+let babyFleeing = [];   // true, если детёныш убегает к границе после укуса
 let awaitingHatch = false;
 let hadBabies = false;
 
@@ -74,6 +76,10 @@ let laserStart = 0, laserEndX = 0, laserEndY = 0;
 let flashStart = 0;
 const FLASH_DURATION = 300;
 const LASER_DURATION = 200;
+
+// Очереди поворотов (макс. длина 2)
+let moveQueue = [];
+let jailMoveQueue = [];
 
 let lastUpdateTime = 0, animationFrameId = null;
 
