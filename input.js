@@ -1,58 +1,46 @@
 window.addEventListener('keydown', e => {
-    // Блокируем стандартное поведение для всех игровых клавиш
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH'].includes(e.code)) {
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH','KeyA'].includes(e.code)) {
         e.preventDefault();
     }
 
-    // Обработка модальных окон (должна быть первой)
     if (startModal.classList.contains('active')) {
-        if (e.code === 'Space') {
-            startGameFromModal();
-        }
+        if (e.code === 'Space') startGameFromModal();
         return;
     }
     if (phase2Modal.classList.contains('active')) {
-        if (e.code === 'Space') {
-            continueFromPhase2();
-        }
+        if (e.code === 'Space') continueFromPhase2();
         return;
     }
     if (cannibalModal.classList.contains('active')) {
-    if (e.code === 'Space') {
-        cannibalModal.classList.remove('active');
+        if (e.code === 'Space') cannibalModal.classList.remove('active');
+        return;
     }
-    return;
-}
     if (helpModal.classList.contains('active')) {
-        if (e.code === 'Space' || e.code === 'KeyH') {
-            helpModal.classList.remove('active');
+        if (e.code === 'Space' || e.code === 'KeyH') helpModal.classList.remove('active');
+        return;
+    }
+    if (abilitiesModal.classList.contains('active')) {
+        if (e.code === 'Space' || e.code === 'KeyH') abilitiesModal.classList.remove('active');
+        return;
+    }
+
+    if (e.code === 'KeyH') { toggleHelp(); return; }
+
+    if (e.code === 'KeyP') {
+        if (gameRunning && !gameOverFlag && !awaitingHatch && !jailMode && !jailCountdown) {
+            paused = !paused;
+            if (paused) {
+                pauseStartTime = performance.now();
+            } else {
+                const pauseDuration = performance.now() - pauseStartTime;
+                lastAppleTime += pauseDuration;
+                lastTimeUpdate += pauseDuration;
+                lastUpdateTime = performance.now();
+            }
         }
         return;
     }
 
-    // Справка (вне модального окна)
-    if (e.code === 'KeyH') {
-        toggleHelp();
-        return;
-    }
-
-    // Пауза
- if (e.code === 'KeyP') {
-    if (gameRunning && !gameOverFlag && !awaitingHatch && !jailMode && !jailCountdown) {
-        paused = !paused;
-        if (paused) {
-            pauseStartTime = performance.now();
-        } else {
-            const pauseDuration = performance.now() - pauseStartTime;
-            lastAppleTime += pauseDuration;
-            lastTimeUpdate += pauseDuration;   // ← чтобы gameTime не учитывал паузу
-            lastUpdateTime = performance.now();
-        }
-    }
-    return;
-}
-
-    // Пробел (обычная игра)
     if (e.code === 'Space') {
         if (awaitingJailStart) {
             awaitingJailStart = false;
@@ -65,11 +53,11 @@ window.addEventListener('keydown', e => {
         if (!gameRunning && !awaitingHatch) { resetGame(); return; }
         return;
     }
-    // Яйцо / вылупление
+
     if (e.code === 'KeyX') {
         if (awaitingHatch) { hatchPlayerFromEgg(); return; }
         if (egg && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) { spawnBabyFromEgg(); return; }
-        const canLay = gameRunning && snake.length >= 20 && !egg
+        const canLay = gameRunning && snake.length >= 18 && !egg
                        && (performance.now() - lastEggTime >= CONFIG.eggCooldownMs)
                        && !awaitingJailStart && !jailMode;
         if (canLay) {
@@ -81,10 +69,8 @@ window.addEventListener('keydown', e => {
         return;
     }
 
-    // Чит-режим
     if (e.code === 'BracketRight') { activateCheats(); return; }
 
-    // Санация
     if (e.code === 'KeyS' && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) {
         if (sanitationCharges > 0) {
             activateSanitation();
@@ -93,26 +79,23 @@ window.addEventListener('keydown', e => {
         return;
     }
 
-    // Остальное только при активной игре
     if (!gameRunning || awaitingHatch || paused) return;
 
-    // Управление в тюрьме
+    if (e.code === 'KeyA') {
+        if (window.activateAbility) window.activateAbility(0);
+        return;
+    }
+
     if (jailMode) {
         const newDir = getDirectionFromCode(e.code);
         if (!newDir) return;
-        // Проверяем последнее направление в очереди (или jailDir, если очередь пуста)
         const lastQueued = jailMoveQueue.length > 0 ? jailMoveQueue[jailMoveQueue.length - 1] : jailDir;
-        // Запрет разворота и дублирования
         if (!isOpposite(newDir, lastQueued) && !isSameDirection(newDir, lastQueued) && jailMoveQueue.length < 2) {
             jailMoveQueue.push(newDir);
         }
         return;
     }
-if (e.code === 'KeyA') {
-    if (window.activateAbility) window.activateAbility(0);
-    return;
-}
-    // Выстрел (лазер или пуля)
+
     if (e.code === 'KeyZ') {
         if (worldDiscovered) {
             if (dir.x || dir.y) fireLaser();
@@ -125,22 +108,19 @@ if (e.code === 'KeyA') {
         return;
     }
 
-    // Основное движение — добавляем в очередь
     const newDir = getDirectionFromCode(e.code);
     if (!newDir) return;
     const lastQueued = moveQueue.length > 0 ? moveQueue[moveQueue.length - 1] : dir;
-    // Проверки: не противоположное, не такое же, не превышаем лимит очереди (2)
     if (!isOpposite(newDir, lastQueued) && !isSameDirection(newDir, lastQueued) && moveQueue.length < 2) {
         moveQueue.push(newDir);
     }
 });
 
-// Вспомогательные функции направлений
 function getDirectionFromCode(code) {
     switch (code) {
-        case 'ArrowUp':    return { x: 0, y: -1 };
-        case 'ArrowDown':  return { x: 0, y: 1 };
-        case 'ArrowLeft':  return { x: -1, y: 0 };
+        case 'ArrowUp': return { x: 0, y: -1 };
+        case 'ArrowDown': return { x: 0, y: 1 };
+        case 'ArrowLeft': return { x: -1, y: 0 };
         case 'ArrowRight': return { x: 1, y: 0 };
         default: return null;
     }
