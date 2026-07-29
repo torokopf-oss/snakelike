@@ -4,24 +4,16 @@ function resetGame() {
     gameTimeSpan.textContent = '0';
     hungerBarOverlay.style.height = '0%';
     hungerBarBg.classList.remove('starving');
-   
+
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
-    moveQueue = [];
-    jailMoveQueue = [];
-    // Показываем стартовое окно
     phase2Modal.classList.remove('active');
     helpModal.classList.remove('active');
+    cannibalModal.classList.remove('active');
+    abilitiesModal.classList.remove('active');
     pauseStartTime = 0;
     snake = [{ x: 10, y: 10 }]; prevSnake = [{ x: 10, y: 10 }];
     dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
-    score = 0; mana = 0; 
-    mana = 0;
-equippedAbilities = [null, null, null];
-abilityCooldowns = [0, 0, 0];
-tailSegments = [];
-if (abilitySlots[0]) abilitySlots[0].innerHTML = '';
-    playerPoopsEaten = 0; applesEaten = 0;
-    if (manaBarBg) manaBarBg.style.height = '0%';
+    score = 0; playerPoopsEaten = 0; applesEaten = 0;
     scoreSpan.textContent = '0'; poopEatenSpan.textContent = '0/5'; gameOverDiv.textContent = '';
     gameRunning = true; gameOverFlag = false; paused = false;
     poisonActive = false; lastPoisonCheck = 0; pill = null; sickParticles = [];
@@ -37,7 +29,7 @@ if (abilitySlots[0]) abilitySlots[0].innerHTML = '';
     jailCountdown = false; flashStart = 0; laserStart = 0;
     worldDiscovered = false; canvas.width = 400;
     worldDiscoveredDown = false;
-    canvas.height = CONFIG.viewHeight * CONFIG.gridSize;   // или 400
+    canvas.height = CONFIG.viewHeight * CONFIG.gridSize;
     egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
     lastEggTime = 0;
     lastAppleTime = performance.now();
@@ -46,6 +38,15 @@ if (abilitySlots[0]) abilitySlots[0].innerHTML = '';
     babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
     babyFleeing = [];
     vultures = []; prevVultures = []; vulturesPerWave = 1; vultureMoveCounter = 0;
+    moveQueue = [];
+    jailMoveQueue = [];
+    mana = 0;
+    manaSpan.textContent = mana;
+    if (manaBarBg) manaBarBg.style.height = '0%';
+    equippedAbilities = [null, null, null];
+    abilityCooldowns = [0, 0, 0];
+    tailSegments = [];
+    if (abilitySlots[0]) abilitySlots[0].innerHTML = '';
     generateFoods();
     lastUpdateTime = performance.now();
     animationFrameId = requestAnimationFrame(gameLoop);
@@ -56,7 +57,7 @@ function stopGame(msg) {
     const timeBonus = timeSec;
     const finalScore = score + timeBonus;
     const reason = msg || 'Игра окончена!';
-const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec} сек)`;
+    const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec} сек)`;
     if (msg === 'Потомство уничтожено') {
         gameRunning = false; gameOverFlag = true;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -82,14 +83,13 @@ const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec} сек)`;
     awaitingHatch = false;
 }
 
-    function startGameFromModal() {
+function startGameFromModal() {
     startModal.classList.remove('active');
-    resetGame();   // запускаем новую игру
+    resetGame();
 }
 
 function continueFromPhase2() {
     phase2Modal.classList.remove('active');
-    // игра продолжается, мы уже в фазе 2
 }
 
 function toggleHelp() {
@@ -99,18 +99,20 @@ function toggleHelp() {
         helpModal.classList.add('active');
     }
 }
+
 // Привязка кнопок модальных окон
 startButton.addEventListener('click', startGameFromModal);
 phase2Button.addEventListener('click', continueFromPhase2);
 helpButton.addEventListener('click', toggleHelp);
 closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
+cannibalButton.addEventListener('click', () => cannibalModal.classList.remove('active'));
+
+// Обработчик модалки навыков
 abilitiesButton.addEventListener('click', () => {
     if (abilitiesModal.classList.contains('active')) {
         abilitiesModal.classList.remove('active');
     } else {
-        // Наполняем список способностей
         abilitiesList.innerHTML = '';
-        // Пока только одна способность — «Отбрасывание хвоста»
         const ability = {
             id: 'tail_drop',
             name: 'Отбрасывание хвоста',
@@ -120,54 +122,20 @@ abilitiesButton.addEventListener('click', () => {
             description: 'Сбросить 40% длины (мин. 15 клеток)'
         };
         const div = document.createElement('div');
-        div.style.cssText = 'width:60px;height:60px;border:2px solid #aaa;text-align:center;font-size:24px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;';
-        div.innerHTML = `<span>${ability.icon}</span><small style="font-size:10px;">${ability.name}</small>`;
+        div.style.cssText = 'width:60px;height:60px;border:2px solid #aaa;text-align:center;font-size:24px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#16213e;';
+        div.innerHTML = `<span>${ability.icon}</span><small style="font-size:10px;color:white;">${ability.name}</small>`;
         div.onclick = () => {
-            // Экипировать в первый слот
             equippedAbilities[0] = ability;
-            abilitySlots[0].innerHTML = ability.icon;
+            if (abilitySlots[0]) abilitySlots[0].innerHTML = ability.icon;
             abilitiesModal.classList.remove('active');
         };
         abilitiesList.appendChild(div);
         abilitiesModal.classList.add('active');
     }
 });
-
 closeAbilitiesButton.addEventListener('click', () => {
     abilitiesModal.classList.remove('active');
 });
-function activateAbility(slot) {
-    if (!gameRunning || paused || jailMode || jailCountdown || awaitingHatch || awaitingJailStart) return;
-    const ability = equippedAbilities[slot];
-    window.activateAbility = activateAbility;
-    if (!ability) return;
-    if (performance.now() < abilityCooldowns[slot]) return;   // кулдаун
-    if (mana < ability.cost) return;
-
-    // Проверка условий способности (пока только для «Отбрасывания хвоста»)
-    if (ability.id === 'tail_drop') {
-        if (snake.length < 15) return;
-        const dropCount = Math.floor(snake.length * 0.4);
-        if (dropCount <= 0) return;
-        const keepLength = snake.length - dropCount;
-        if (keepLength < 1) return;
-
-        // Отрезаем хвост
-        const dropped = snake.splice(keepLength);
-        prevSnake = snake.map(s => ({...s}));   // обновляем prevSnake до новой длины
-
-        // Делаем сброшенные сегменты исчезающими
-        const now = performance.now();
-        for (const seg of dropped) {
-            tailSegments.push({ x: seg.x, y: seg.y, life: 500 }); // 500 мс жизнь
-        }
-
-        mana -= ability.cost;
-        manaSpan.textContent = mana;
-        if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
-        abilityCooldowns[slot] = now + ability.cooldown * 1000;
-    }
-}
 
 function updateBullet() {
     if (!bullet || worldDiscovered) return;
@@ -211,68 +179,113 @@ function updatePoison() {
     }
 }
 
-function updateGame() {
-    // Обновление игрового времени (если игра активна)
-if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch &&
-    !startModal.classList.contains('active') && !phase2Modal.classList.contains('active') && !helpModal.classList.contains('active')) {
-    gameTime += performance.now() - lastTimeUpdate;
-    lastTimeUpdate = performance.now();
-    const totalSec = Math.floor(gameTime / 1000);
-    gameTimeSpan.textContent = totalSec;   // просто количество секунд
-} else {
-    lastTimeUpdate = performance.now();
+function activateAbility(slot) {
+    if (!gameRunning || paused || jailMode || jailCountdown || awaitingHatch || awaitingJailStart) return;
+    const ability = equippedAbilities[slot];
+    if (!ability) return;
+    if (performance.now() < abilityCooldowns[slot]) return;
+    if (mana < ability.cost) return;
+
+    if (ability.id === 'tail_drop') {
+        if (snake.length < 15) return;
+        const dropCount = Math.floor(snake.length * 0.4);
+        if (dropCount <= 0) return;
+        const keepLength = snake.length - dropCount;
+        if (keepLength < 1) return;
+
+        const dropped = snake.splice(keepLength);
+        prevSnake = snake.map(s => ({...s}));
+
+        const now = performance.now();
+        for (const seg of dropped) {
+            tailSegments.push({ x: seg.x, y: seg.y, life: 500 });
+        }
+
+        mana -= ability.cost;
+        manaSpan.textContent = mana;
+        if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
+        abilityCooldowns[slot] = now + ability.cooldown * 1000;
+    }
 }
-    
-    if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || cannibalModal.classList.contains('active') || helpModal.classList.contains('active') || abilitiesModal.classList.contains('active')) return;
+window.activateAbility = activateAbility;
+
+function updateManaBar() {
+    if (manaBarBg) {
+        const percent = (mana / MAX_MANA) * 100;
+        manaBarBg.style.height = percent + '%';
+    }
+}
+
+function updateGame() {
+    if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch &&
+        !startModal.classList.contains('active') && !phase2Modal.classList.contains('active') &&
+        !cannibalModal.classList.contains('active') && !helpModal.classList.contains('active') &&
+        !abilitiesModal.classList.contains('active')) {
+        gameTime += performance.now() - lastTimeUpdate;
+        lastTimeUpdate = performance.now();
+        const totalSec = Math.floor(gameTime / 1000);
+        gameTimeSpan.textContent = totalSec;
+    } else {
+        lastTimeUpdate = performance.now();
+    }
+
+    if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') ||
+        cannibalModal.classList.contains('active') || helpModal.classList.contains('active') ||
+        abilitiesModal.classList.contains('active')) return;
     if (!gameRunning || paused) return;
     if (awaitingJailStart) return;
     if (jailCountdown) { updateCountdown(); return; }
     if (jailMode) { updateJail(); return; }
     if (awaitingHatch) return;
-     // Пополнение зарядов санации
+
     if (!sanitationMilestoneReached && score >= 1000) {
         sanitationCharges += 2;
         sanitationMilestoneReached = true;
         nextSanitationScore = 1500;
     }
-  
-// Обновление полоски голода (чернеет сверху вниз)
-const remaining = Math.max(0, CONFIG.hungerTime - (performance.now() - lastAppleTime));
-const hungerFraction = remaining / CONFIG.hungerTime;   // 1 = полный, 0 = пустой
-hungerBarOverlay.style.height = ((1 - hungerFraction) * 100) + '%';  // чёрный растёт сверху
 
-if (isStarving) {
-    hungerBarBg.classList.add('starving');
-} else {
-    hungerBarBg.classList.remove('starving');
-}
-    
+    const remaining = Math.max(0, CONFIG.hungerTime - (performance.now() - lastAppleTime));
+    const hungerFraction = remaining / CONFIG.hungerTime;
+    hungerBarOverlay.style.height = ((1 - hungerFraction) * 100) + '%';
+    if (isStarving) {
+        hungerBarBg.classList.add('starving');
+    } else {
+        hungerBarBg.classList.remove('starving');
+    }
+
     prevVultures = vultures.map(v => ({...v}));
     updatePlayer();
     if (!worldDiscovered) updateBullet();
     updatePoison();
-    // Голод
-if (gameRunning && !awaitingHatch && !jailMode) {
-    if (performance.now() - lastAppleTime >= CONFIG.hungerTime) {
-        if (!isStarving) {
-            isStarving = true;
-            lastHungerTick = performance.now();
-        } else {
-            const elapsed = performance.now() - lastHungerTick;
-            if (elapsed >= 1000) {
-                const seconds = Math.floor(elapsed / 1000);
-                score = Math.max(0, score - CONFIG.hungerPenaltyPerSecond * seconds);
-                scoreSpan.textContent = score;
-                lastHungerTick += seconds * 1000;
-                if (score <= 0) stopGame('Смерть от голода');
+
+    if (gameRunning && !awaitingHatch && !jailMode) {
+        if (performance.now() - lastAppleTime >= CONFIG.hungerTime) {
+            if (!isStarving) {
+                isStarving = true;
+                lastHungerTick = performance.now();
+            } else {
+                const elapsed = performance.now() - lastHungerTick;
+                if (elapsed >= 1000) {
+                    const seconds = Math.floor(elapsed / 1000);
+                    score = Math.max(0, score - CONFIG.hungerPenaltyPerSecond * seconds);
+                    scoreSpan.textContent = score;
+                    lastHungerTick += seconds * 1000;
+                    if (score <= 0) stopGame('Смерть от голода');
+                }
             }
+        } else {
+            isStarving = false;
         }
-    } else {
-        isStarving = false;
     }
-}
+
     updateBabies();
-    
+
+    // Обновление исчезающих сегментов хвоста
+    tailSegments = tailSegments.filter(seg => {
+        seg.life -= 16;
+        return seg.life > 0;
+    });
+
     vultureMoveCounter++;
     if (vultureMoveCounter >= CONFIG.vultureSpeedDivider) { updateVultures(); vultureMoveCounter = 0; }
 
@@ -291,11 +304,7 @@ if (gameRunning && !awaitingHatch && !jailMode) {
     if (poopSnakeMessageText && performance.now() > poopSnakeMessageUntil) poopSnakeMessageText = '';
     if (warningActive) warningPulse += 0.1;
 }
-function updateManaBar() {
-    if (!manaBarBg) return;
-    const percent = Math.min(100, (mana / MAX_MANA) * 100);
-    manaBarBg.style.height = percent + '%';
-}
+
 function gameLoop(now) {
     if (!gameRunning && !jailCountdown && !awaitingHatch) { drawGame(1, now); animationFrameId = null; return; }
     if (paused) {
@@ -306,14 +315,10 @@ function gameLoop(now) {
     }
     const elapsed = now - lastUpdateTime;
     if (elapsed >= CONFIG.snakeSpeed) { updateGame(); lastUpdateTime += CONFIG.snakeSpeed; }
-    // Обновление исчезающих сегментов хвоста
-tailSegments = tailSegments.filter(seg => {
-    seg.life -= 16;   // 16 мс на кадр
-    return seg.life > 0;
-});
     sickParticles = sickParticles.filter(p => (p.x += p.vx*16/1000, p.y += p.vy*16/1000, p.life -= 16) > 0);
     const t = gameRunning ? Math.min((now - lastUpdateTime) / CONFIG.snakeSpeed, 1) : 1;
     drawGame(t, now);
     animationFrameId = requestAnimationFrame(gameLoop);
 }
+
 startModal.classList.add('active');
