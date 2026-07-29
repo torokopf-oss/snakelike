@@ -14,7 +14,13 @@ function resetGame() {
     pauseStartTime = 0;
     snake = [{ x: 10, y: 10 }]; prevSnake = [{ x: 10, y: 10 }];
     dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
-    score = 0; mana = 0; playerPoopsEaten = 0; applesEaten = 0;
+    score = 0; mana = 0; 
+    mana = 0;
+equippedAbilities = [null, null, null];
+abilityCooldowns = [0, 0, 0];
+tailSegments = [];
+if (abilitySlots[0]) abilitySlots[0].innerHTML = '';
+    playerPoopsEaten = 0; applesEaten = 0;
     if (manaBarBg) manaBarBg.style.height = '0%';
     scoreSpan.textContent = '0'; poopEatenSpan.textContent = '0/5'; gameOverDiv.textContent = '';
     gameRunning = true; gameOverFlag = false; paused = false;
@@ -98,6 +104,69 @@ startButton.addEventListener('click', startGameFromModal);
 phase2Button.addEventListener('click', continueFromPhase2);
 helpButton.addEventListener('click', toggleHelp);
 closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
+abilitiesButton.addEventListener('click', () => {
+    if (abilitiesModal.classList.contains('active')) {
+        abilitiesModal.classList.remove('active');
+    } else {
+        // Наполняем список способностей
+        abilitiesList.innerHTML = '';
+        // Пока только одна способность — «Отбрасывание хвоста»
+        const ability = {
+            id: 'tail_drop',
+            name: 'Отбрасывание хвоста',
+            icon: '🦎',
+            cost: 50,
+            cooldown: 15,
+            description: 'Сбросить 40% длины (мин. 15 клеток)'
+        };
+        const div = document.createElement('div');
+        div.style.cssText = 'width:60px;height:60px;border:2px solid #aaa;text-align:center;font-size:24px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;';
+        div.innerHTML = `<span>${ability.icon}</span><small style="font-size:10px;">${ability.name}</small>`;
+        div.onclick = () => {
+            // Экипировать в первый слот
+            equippedAbilities[0] = ability;
+            abilitySlots[0].innerHTML = ability.icon;
+            abilitiesModal.classList.remove('active');
+        };
+        abilitiesList.appendChild(div);
+        abilitiesModal.classList.add('active');
+    }
+});
+
+closeAbilitiesButton.addEventListener('click', () => {
+    abilitiesModal.classList.remove('active');
+});
+function activateAbility(slot) {
+    if (!gameRunning || paused || jailMode || jailCountdown || awaitingHatch || awaitingJailStart) return;
+    const ability = equippedAbilities[slot];
+    if (!ability) return;
+    if (performance.now() < abilityCooldowns[slot]) return;   // кулдаун
+    if (mana < ability.cost) return;
+
+    // Проверка условий способности (пока только для «Отбрасывания хвоста»)
+    if (ability.id === 'tail_drop') {
+        if (snake.length < 15) return;
+        const dropCount = Math.floor(snake.length * 0.4);
+        if (dropCount <= 0) return;
+        const keepLength = snake.length - dropCount;
+        if (keepLength < 1) return;
+
+        // Отрезаем хвост
+        const dropped = snake.splice(keepLength);
+        prevSnake = snake.map(s => ({...s}));   // обновляем prevSnake до новой длины
+
+        // Делаем сброшенные сегменты исчезающими
+        const now = performance.now();
+        for (const seg of dropped) {
+            tailSegments.push({ x: seg.x, y: seg.y, life: 500 }); // 500 мс жизнь
+        }
+
+        mana -= ability.cost;
+        manaSpan.textContent = mana;
+        if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
+        abilityCooldowns[slot] = now + ability.cooldown * 1000;
+    }
+}
 
 function updateBullet() {
     if (!bullet || worldDiscovered) return;
@@ -153,7 +222,7 @@ if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch 
     lastTimeUpdate = performance.now();
 }
     
-    if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || cannibalModal.classList.contains('active') || helpModal.classList.contains('active')) return;
+    if (startModal.classList.contains('active') || phase2Modal.classList.contains('active') || cannibalModal.classList.contains('active') || helpModal.classList.contains('active') || abilitiesModal.classList.contains('active')) return;
     if (!gameRunning || paused) return;
     if (awaitingJailStart) return;
     if (jailCountdown) { updateCountdown(); return; }
@@ -236,6 +305,11 @@ function gameLoop(now) {
     }
     const elapsed = now - lastUpdateTime;
     if (elapsed >= CONFIG.snakeSpeed) { updateGame(); lastUpdateTime += CONFIG.snakeSpeed; }
+    // Обновление исчезающих сегментов хвоста
+tailSegments = tailSegments.filter(seg => {
+    seg.life -= 16;   // 16 мс на кадр
+    return seg.life > 0;
+});
     sickParticles = sickParticles.filter(p => (p.x += p.vx*16/1000, p.y += p.vy*16/1000, p.life -= 16) > 0);
     const t = gameRunning ? Math.min((now - lastUpdateTime) / CONFIG.snakeSpeed, 1) : 1;
     drawGame(t, now);
