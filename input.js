@@ -65,10 +65,6 @@ window.addEventListener('keydown', e => {
         if (!gameRunning && !awaitingHatch) { resetGame(); return; }
         return;
     }
-if (e.code === 'KeyA') {
-    activateAbility(0);
-    return;
-}
     // Яйцо / вылупление
     if (e.code === 'KeyX') {
         if (awaitingHatch) { hatchPlayerFromEgg(); return; }
@@ -112,7 +108,10 @@ if (e.code === 'KeyA') {
         }
         return;
     }
-
+if (e.code === 'KeyA') {
+    if (window.activateAbility) window.activateAbility(0);
+    return;
+}
     // Выстрел (лазер или пуля)
     if (e.code === 'KeyZ') {
         if (worldDiscovered) {
