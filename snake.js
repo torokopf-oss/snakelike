@@ -48,6 +48,7 @@ function updatePlayer() {
         worldDiscoveredDown = true;
         canvas.height = CONFIG.fullHeight * CONFIG.gridSize;
         generateFoods();
+        cannibalModal.classList.add('active');
     }
 
     if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= maxY()) { stopGame(); return; }
