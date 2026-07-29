@@ -17,6 +17,12 @@ window.addEventListener('keydown', e => {
         }
         return;
     }
+    if (cannibalModal.classList.contains('active')) {
+    if (e.code === 'Space') {
+        cannibalModal.classList.remove('active');
+    }
+    return;
+}
     if (helpModal.classList.contains('active')) {
         if (e.code === 'Space' || e.code === 'KeyH') {
             helpModal.classList.remove('active');
