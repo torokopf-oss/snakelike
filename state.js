@@ -13,6 +13,8 @@ const phase2Modal = document.getElementById('phase2Modal');
 const helpModal = document.getElementById('helpModal');
 const startButton = document.getElementById('startButton');
 const phase2Button = document.getElementById('phase2Button');
+const cannibalModal = document.getElementById('cannibalModal');
+const cannibalButton = document.getElementById('cannibalButton');
 const helpButton = document.getElementById('helpButton');
 const closeHelpButton = document.getElementById('closeHelpButton');
 const gameTimeSpan = document.getElementById('gameTimeDisplay');
@@ -63,6 +65,7 @@ let egg = null, eggCooldown = 0;
 let firstEggLaid = false, eggAppleCounter = 0;
 let lastEggTime = 0;  
 let babySnakes = [], babyPrevSnakes = [], babyDirections = [];
+let babyFleeing = [];   // true, если детёныш убегает к границе после укуса
 let awaitingHatch = false;
 let hadBabies = false;
 
