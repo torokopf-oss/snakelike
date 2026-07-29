@@ -147,10 +147,16 @@
     <button class="help-button" id="helpButton">Справка</button>
 </div>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
-      <div id="hungerBarContainer">
-    <div id="hungerBarBg"></div>
-    <div id="hungerBarOverlay"></div>
+<div style="display: flex; flex-direction: row; gap: 8px;">
+    <div id="hungerBarContainer" style="width:14px; height:400px; background:#0f0f1a; border:1px solid #e94560; border-radius:4px; overflow:hidden; flex-shrink:0; position:relative;">
+        <div id="hungerBarBg" style="position:absolute; bottom:0; left:0; width:100%; height:100%; background:#f1c40f; transition:background 0.5s;"></div>
+        <div id="hungerBarOverlay" style="position:absolute; top:0; left:0; width:100%; height:0%; background:#0f0f1a; transition:height 0.5s;"></div>
+    </div>
+    <div id="manaBarContainer" style="width:14px; height:400px; background:#0f0f1a; border:1px solid #3498db; border-radius:4px; overflow:hidden; flex-shrink:0; position:relative;">
+        <div id="manaBarBg" style="position:absolute; bottom:0; left:0; width:100%; height:0%; background:#3498db; transition:height 0.3s;"></div>
+    </div>
 </div>
+        
     </div>
     <div id="gameOverText" style="display: none;"></div>
 
