@@ -178,8 +178,9 @@ function updateBabies() {
             }
         }
 
-        // ---------- Универсальная проверка: нельзя заходить на клетку змейки ----------
-        if (snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
+        // ---------- Универсальная проверка прохода сквозь змейку ----------
+        const blockThroughSnake = !worldDiscoveredDown || (babyFleeing[b] && babyFleeing[b].active);
+        if (blockThroughSnake && snake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) {
             // Пытаемся объехать (перпендикулярные направления)
             const alts = desiredDir.x !== 0
                 ? [{ x: 0, y: 1 }, { x: 0, y: -1 }]
@@ -191,7 +192,6 @@ function updateBabies() {
                 if (altHead.x < 0 || altHead.x >= maxX() || altHead.y < 0 || altHead.y >= maxY()) continue;
                 if (poopSnakeActive && poopSnake.some(seg => seg.x === altHead.x && seg.y === altHead.y)) continue;
                 if (snake.some(seg => seg.x === altHead.x && seg.y === altHead.y)) continue;
-                // Применяем альтернативу
                 desiredDir = alt;
                 babyDirections[b] = alt;
                 newHead = altHead;
@@ -199,7 +199,6 @@ function updateBabies() {
                 break;
             }
             if (!moved) {
-                // Не можем сдвинуться — пропускаем ход
                 continue;
             }
         }
