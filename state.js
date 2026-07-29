@@ -19,6 +19,15 @@ const cannibalModal = document.getElementById('cannibalModal');
 const cannibalButton = document.getElementById('cannibalButton');
 const helpButton = document.getElementById('helpButton');
 const closeHelpButton = document.getElementById('closeHelpButton');
+const abilitiesButton = document.getElementById('abilitiesButton');
+const abilitiesModal = document.getElementById('abilitiesModal');
+const abilitiesList = document.getElementById('abilitiesList');
+const closeAbilitiesButton = document.getElementById('closeAbilitiesButton');
+const abilitySlots = [
+    document.getElementById('abilitySlot1'),
+    document.getElementById('abilitySlot2'),
+    document.getElementById('abilitySlot3')
+];
 const gameTimeSpan = document.getElementById('gameTimeDisplay');
 let worldDiscoveredDown = false;
 let gameTime = 0;                // прошедшее время активной игры (мс)
@@ -31,6 +40,10 @@ let gameOverLines = [];
 let dir = { x: 0, y: 0 };
 let score = 0, highScore = 0;
 let mana = 0;
+const MAX_MANA = 100;
+let equippedAbilities = [null, null, null];   // три слота, пока доступен только 0
+let abilityCooldowns = [0, 0, 0];             // время окончания кулдауна для каждого слота (performance.now())
+let tailSegments = [];                        // сброшенные сегменты хвоста {x, y, life}
 const MAX_MANA = 100;
 let gameRunning = false, gameOverFlag = false;
 let paused = false;
