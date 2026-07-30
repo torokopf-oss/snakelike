@@ -145,6 +145,12 @@
     <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
     <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
     <div class="info-item">🕒 <span id="gameTimeDisplay">00:00</span></div>
+        <div class="ability-slots" style="display:flex; flex-direction:column; gap:4px; margin-top:8px;">
+    <div id="abilitySlot1" class="ability-slot active-slot" style="width:20px;height:20px;border:2px solid #aaa;background:#111;text-align:center;line-height:20px;font-size:12px;color:white;"></div>
+    <div id="abilitySlot2" class="ability-slot locked-slot" style="width:20px;height:20px;border:2px solid #555;background:#222;opacity:0.4;"></div>
+    <div id="abilitySlot3" class="ability-slot locked-slot" style="width:20px;height:20px;border:2px solid #555;background:#222;opacity:0.4;"></div>
+</div>
+<button class="help-button" id="abilitiesButton" style="margin-top:4px;">Навыки</button>
     <button class="help-button" id="helpButton">Справка</button>
 </div>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
@@ -185,6 +191,13 @@
         Санация: S (накапливайте очки, чтобы восполнить заряды)</p>
         <button id="closeHelpButton">Закрыть (H)</button>
     </div>
+    <div class="modal" id="abilitiesModal">
+    <h2>Выбор навыков</h2>
+    <div id="abilitiesList" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:10px 0;">
+        <!-- Способности будут добавлены динамически -->
+    </div>
+    <button id="closeAbilitiesButton">Закрыть</button>
+</div>
 </div>
 
 <script src="config.js"></script>

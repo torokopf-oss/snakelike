@@ -319,7 +319,20 @@ function drawGame(t, now) {
         }
         ctx.restore();
     }
-
+// Отрисовка сброшенных сегментов хвоста
+for (const seg of tailSegments) {
+    const alpha = Math.min(1, seg.life / 500);
+    const px = seg.x * gs, py = seg.y * gs;
+    ctx.fillStyle = `rgba(233, 69, 96, ${alpha})`;   // цвет игрока, но прозрачный
+    ctx.fillRect(px + 1, py + 1, gs - 2, gs - 2);
+}
+    // Сброшенные сегменты хвоста
+for (const seg of tailSegments) {
+    const alpha = Math.min(1, seg.life / 500);
+    const px = seg.x * gs, py = seg.y * gs;
+    ctx.fillStyle = `rgba(233, 69, 96, ${alpha})`;
+    ctx.fillRect(px + 1, py + 1, gs - 2, gs - 2);
+}
     // Сообщения
     if (paused && gameRunning) {
         ctx.fillStyle = 'rgba(0,0,0,0.5)';
