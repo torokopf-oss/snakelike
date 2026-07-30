@@ -99,6 +99,7 @@ let jailMoveQueue = [];
 let equippedAbilities = [null, null, null];
 let abilityCooldowns = [0, 0, 0];
 let tailSegments = [];
+let purchasedAbilities = [];   // список ID купленных способностей
 
 let lastUpdateTime = 0, animationFrameId = null;
 
