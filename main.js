@@ -4,7 +4,7 @@ function resetGame() {
     gameTimeSpan.textContent = '0';
     hungerBarOverlay.style.height = '0%';
     hungerBarBg.classList.remove('starving');
-
+    purchasedAbilities = [];
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     phase2Modal.classList.remove('active');
     helpModal.classList.remove('active');
