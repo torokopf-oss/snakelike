@@ -41,6 +41,7 @@ let gameOverLines = [];
 let dir = { x: 0, y: 0 };
 let score = 0, highScore = 0;
 let mana = 0;
+
 const MAX_MANA = 100;
 let gameRunning = false, gameOverFlag = false;
 let paused = false;
@@ -100,7 +101,9 @@ let equippedAbilities = [null, null, null];
 let abilityCooldowns = [0, 0, 0];
 let tailSegments = [];
 let purchasedAbilities = [];   // список ID купленных способностей
-
+// ... все предыдущие переменные ...
+let abilitySlotsUnlocked = [true, false, false];   // первый слот доступен сразу
+// ...
 let lastUpdateTime = 0, animationFrameId = null;
 
 // Загрузка рекорда
