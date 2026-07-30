@@ -1,5 +1,5 @@
 window.addEventListener('keydown', e => {
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH','KeyA'].includes(e.code)) {
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH','KeyA','KeyC'].includes(e.code)) {
         e.preventDefault();
     }
 
@@ -71,18 +71,16 @@ window.addEventListener('keydown', e => {
 
     if (e.code === 'BracketRight') { activateCheats(); return; }
 
-    if (e.code === 'KeyS' && gameRunning && worldDiscovered && !awaitingJailStart && !jailMode) {
-        if (sanitationCharges > 0) {
-            activateSanitation();
-            sanitationCharges--;
-        }
-        return;
-    }
+    // Клавиша C больше не используется для санации
 
     if (!gameRunning || awaitingHatch || paused) return;
 
     if (e.code === 'KeyA') {
         if (window.activateAbility) window.activateAbility(0);
+        return;
+    }
+    if (e.code === 'KeyS') {
+        if (window.activateAbility) window.activateAbility(1);
         return;
     }
 
@@ -96,17 +94,7 @@ window.addEventListener('keydown', e => {
         return;
     }
 
-    if (e.code === 'KeyZ') {
-        if (worldDiscovered) {
-            if (dir.x || dir.y) fireLaser();
-            return;
-        }
-        if (!bullet && (dir.x || dir.y)) {
-            bullet = { x: snake[0].x + dir.x, y: snake[0].y + dir.y, dirX: dir.x, dirY: dir.y };
-            prevBullet = null;
-        }
-        return;
-    }
+    // KeyZ больше не обрабатывается
 
     const newDir = getDirectionFromCode(e.code);
     if (!newDir) return;
