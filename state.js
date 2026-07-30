@@ -5,7 +5,6 @@ const scoreSpan = document.getElementById('scoreDisplay');
 const poopEatenSpan = document.getElementById('poopEatenDisplay');
 const highScoreSpan = document.getElementById('highScoreDisplay');
 const gameOverDiv = document.getElementById('gameOverText');
-// Модальные окна
 const startModal = document.getElementById('startModal');
 const hungerBarBg = document.getElementById('hungerBarBg');
 const hungerBarOverlay = document.getElementById('hungerBarOverlay');
@@ -33,7 +32,6 @@ const abilitySlots = [
 let worldDiscoveredDown = false;
 let gameTime = 0;
 let lastTimeUpdate = 0;
-const gameTimeDisplay = null;
 
 // ---------- Состояние ----------
 let snake = [], prevSnake = [];
@@ -41,7 +39,6 @@ let gameOverLines = [];
 let dir = { x: 0, y: 0 };
 let score = 0, highScore = 0;
 let mana = 0;
-
 const MAX_MANA = 100;
 let gameRunning = false, gameOverFlag = false;
 let paused = false;
@@ -64,7 +61,7 @@ let warningActive = false, warningPulse = 0, spawnSide = -1;
 let poopSnakeMessageText = '', poopSnakeMessageUntil = 0;
 
 let bullet = null, prevBullet = null;
-let sanitationCharges = 0;
+let sanitationCharges = 0;   // устаревшее, но оставлено для совместимости
 let nextSanitationScore = 1000;
 let sanitationMilestoneReached = false;
 let jailMode = false, jailSnake = [], jailPrevSnake = [];
@@ -92,7 +89,6 @@ let flashStart = 0;
 const FLASH_DURATION = 300;
 const LASER_DURATION = 200;
 
-// Очереди поворотов
 let moveQueue = [];
 let jailMoveQueue = [];
 
@@ -100,10 +96,9 @@ let jailMoveQueue = [];
 let equippedAbilities = [null, null, null];
 let abilityCooldowns = [0, 0, 0];
 let tailSegments = [];
-let purchasedAbilities = [];   // список ID купленных способностей
-// ... все предыдущие переменные ...
-let abilitySlotsUnlocked = [true, false, false];   // первый слот доступен сразу
-// ...
+let purchasedAbilities = [];
+let abilitySlotsUnlocked = [true, false, false];
+
 let lastUpdateTime = 0, animationFrameId = null;
 
 // Загрузка рекорда
