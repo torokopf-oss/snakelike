@@ -50,6 +50,18 @@ function resetGame() {
     generateFoods();
     lastUpdateTime = performance.now();
     animationFrameId = requestAnimationFrame(gameLoop);
+    abilitySlotsUnlocked = [true, false, false];
+// визуальный сброс второго и третьего слотов
+if (abilitySlots[1]) {
+    abilitySlots[1].style.background = '#222';
+    abilitySlots[1].style.borderColor = '#555';
+    abilitySlots[1].style.opacity = '0.4';
+}
+if (abilitySlots[2]) {
+    abilitySlots[2].style.background = '#222';
+    abilitySlots[2].style.borderColor = '#555';
+    abilitySlots[2].style.opacity = '0.4';
+}
 }
 
 function stopGame(msg) {
