@@ -4,12 +4,9 @@ function updatePlayer() {
     prevSnake = snake.map(s => ({...s}));
     prevFoods = foods.map(f => ({...f}));
 
-    // Извлекаем первый поворот из очереди, если есть
     if (moveQueue.length > 0) {
         dir = moveQueue.shift();
     }
-    // Если очередь пуста, dir остаётся прежним (движение по инерции)
-
     if (!dir.x && !dir.y) return;
 
     const head = snake[0];
@@ -19,6 +16,7 @@ function updatePlayer() {
     if (!worldDiscovered && snake.length >= 30 && newHead.x === CONFIG.viewWidth && newHead.y >= 0 && newHead.y < maxY()) {
         worldDiscovered = true;
         canvas.width = CONFIG.fullWidth * CONFIG.gridSize;
+        if (window.unlockAbilitySlot) window.unlockAbilitySlot(1);   // разблокируем второй слот
         lastEggTime = performance.now();
 
         const newLen = Math.floor(snake.length / 2);
@@ -48,11 +46,74 @@ function updatePlayer() {
         worldDiscoveredDown = true;
         canvas.height = CONFIG.fullHeight * CONFIG.gridSize;
         generateFoods();
+        cannibalModal.classList.add('active');
     }
 
     if (newHead.x < 0 || newHead.x >= maxX() || newHead.y < 0 || newHead.y >= maxY()) { stopGame(); return; }
 
     if (poopSnakeActive && poopSnake.some(seg => seg.x === newHead.x && seg.y === newHead.y)) { stopGame('Вас сожрал Говноед!'); return; }
+
+    // В третьей фазе игрок и детёныши могут поедать друг друга
+    if (worldDiscoveredDown) {
+        let babyBiteInfo = null;
+        for (let b = 0; b < babySnakes.length; b++) {
+            const baby = babySnakes[b];
+            if (!baby) continue;
+            const idx = baby.findIndex(seg => seg.x === newHead.x && seg.y === newHead.y);
+            if (idx !== -1) {
+                babyBiteInfo = { b, idx, isHead: idx === 0 };
+                break;
+            }
+        }
+        if (babyBiteInfo) {
+            if (babyBiteInfo.isHead) {
+                if (snake.length <= 1) {
+                    stopGame('Вас убил детёныш!');
+                    return;
+                }
+                const baby = babySnakes[babyBiteInfo.b];
+                for (const seg of baby) {
+                    const fi = foods.findIndex(f => f.x === seg.x && f.y === seg.y);
+                    if (fi !== -1) foods.splice(fi, 1);
+                    const pi = poops.findIndex(p => p.x === seg.x && p.y === seg.y);
+                    if (pi !== -1) poops.splice(pi, 1);
+                    if (pill && pill.x === seg.x && pill.y === seg.y) pill = null;
+                    if (egg && egg.x === seg.x && egg.y === seg.y) egg = null;
+                    foods.push({ x: seg.x, y: seg.y });
+                }
+                prevFoods = foods.map(f => ({...f}));
+                babySnakes.splice(babyBiteInfo.b, 1);
+                babyPrevSnakes.splice(babyBiteInfo.b, 1);
+                babyDirections.splice(babyBiteInfo.b, 1);
+                babyFleeing.splice(babyBiteInfo.b, 1);
+                score += 50;
+                scoreSpan.textContent = score;
+            } else {
+                const baby = babySnakes[babyBiteInfo.b];
+                const oldTail = snake[snake.length - 1];
+                snake.unshift(newHead);
+                prevSnake.push({ ...oldTail });
+                if (baby.length <= 1) {
+                    babySnakes.splice(babyBiteInfo.b, 1);
+                    babyPrevSnakes.splice(babyBiteInfo.b, 1);
+                    babyDirections.splice(babyBiteInfo.b, 1);
+                    babyFleeing.splice(babyBiteInfo.b, 1);
+                } else {
+                    baby.pop();
+                }
+                const fi = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
+                if (fi !== -1) foods.splice(fi, 1);
+                const pi = poops.findIndex(p => p.x === newHead.x && p.y === newHead.y);
+                if (pi !== -1) poops.splice(pi, 1);
+                if (pill && pill.x === newHead.x && pill.y === newHead.y) pill = null;
+                if (egg && egg.x === newHead.x && egg.y === newHead.y) egg = null;
+                score += 20;
+                scoreSpan.textContent = score;
+                if (eggCooldown > 0) eggCooldown--;
+                return;
+            }
+        }
+    }
 
     const willEatFood = foods.some(f => f.x === newHead.x && f.y === newHead.y);
     const willEatPoop = poops.some(p => p.x === newHead.x && p.y === newHead.y);
@@ -71,6 +132,9 @@ function updatePlayer() {
             applesEaten++;
             score += 10 + snake.length;
             scoreSpan.textContent = score;
+            mana = Math.min(mana + 10, MAX_MANA);
+            manaSpan.textContent = mana;
+            if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
             snake[snake.length - 1].glowUntil = performance.now() + 500;
             break;
         }
@@ -155,7 +219,10 @@ function hatchPlayerFromEgg() {
     snake = [{ ...egg }]; prevSnake = [{ ...egg }];
     dir = { x: 1, y: 0 };
     egg = null; awaitingHatch = false; gameRunning = true; gameOverFlag = false; gameOverDiv.textContent = '';
-    moveQueue = []; // очищаем очередь после вылупления
+    moveQueue = [];
+    lastAppleTime = performance.now();
+    isStarving = false;
+    lastHungerTick = 0;
 }
 
 function spawnBabyFromEgg() {
@@ -172,7 +239,7 @@ function spawnBabyFromEgg() {
 
 function activateCheats() {
     if (!gameRunning) return;
-    moveQueue = []; // сбрасываем очередь
+    moveQueue = [];
     if (!worldDiscovered) {
         const head = { x: 19, y: 10 };
         snake = [head];

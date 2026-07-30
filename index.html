@@ -16,13 +16,11 @@
             align-items: center;
             min-height: 100vh;
         }
-
         .game-container {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-
         .game-area {
             display: flex;
             flex-direction: row;
@@ -30,7 +28,6 @@
             justify-content: center;
             gap: 10px;
         }
-
         .side-panel {
             display: flex;
             flex-direction: column;
@@ -41,61 +38,80 @@
             width: 120px;
             text-align: left;
         }
-
         .info-item {
             white-space: nowrap;
         }
-
         canvas {
             border: 2px solid #e94560;
             background: #16213e;
             box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
         }
-
-    #hungerBarContainer {
-    width: 14px;
-    height: 400px;               /* строго как холст */
-    background: #0f0f1a;
-    border: 1px solid #e94560;
-    border-radius: 4px;
-    overflow: hidden;
-    flex-shrink: 0;
-    position: relative;          /* для абсолютного позиционирования внутри */
-}
-
-#hungerBarBg {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;                 /* всегда полный, жёлтый */
-    background: #f1c40f;
-    transition: background 0.5s;
-}
-
-#hungerBarOverlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 0%;                   /* изначально нет чёрного */
-    background: #0f0f1a;          /* чёрный, как фон контейнера */
-    transition: height 0.5s;
-}
-        
-       .help-button {
-    margin-top: 12px;          /* отступ от таймера */
-    background: none;
-    border: 1px solid #aaa;
-    color: #aaa;
-    padding: 4px 12px;
-    font-size: 14px;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;               /* на всю ширину панели */
-    text-align: center;
-}
-
+        #hungerBarContainer {
+            width: 14px;
+            height: 400px;
+            background: #0f0f1a;
+            border: 1px solid #e94560;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+        #hungerBarBg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #f1c40f;
+            transition: background 0.5s;
+        }
+        #hungerBarOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: #0f0f1a;
+            transition: height 0.5s;
+        }
+        #manaBarContainer {
+            width: 14px;
+            height: 400px;
+            background: #0f0f1a;
+            border: 1px solid #3498db;
+            border-radius: 4px;
+            overflow: hidden;
+            flex-shrink: 0;
+            position: relative;
+        }
+        #manaBarBg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: #3498db;
+            transition: height 0.3s;
+        }
+        .help-button, .abilities-button {
+            margin-top: 4px;
+            background: none;
+            border: 1px solid #aaa;
+            color: #aaa;
+            padding: 4px 12px;
+            font-size: 14px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            text-align: center;
+        }
+        .ability-slot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: background 0.3s, border-color 0.3s, opacity 0.3s;
+        }
         .modal {
             display: none;
             position: absolute;
@@ -109,22 +125,18 @@
             color: white;
             font-family: 'Segoe UI', sans-serif;
         }
-
         .modal.active {
             display: flex;
         }
-
         .modal h2 {
             font-size: 36px;
             margin-bottom: 10px;
         }
-
         .modal p {
             font-size: 18px;
             margin-bottom: 20px;
             text-align: center;
         }
-
         .modal button {
             padding: 10px 30px;
             font-size: 20px;
@@ -139,18 +151,30 @@
 <body>
 <div class="game-container" id="gameContainer">
     <div class="game-area">
-    <div class="side-panel">
-    <div class="info-item">🍎 Очки: <span id="scoreDisplay">0</span></div>
-    <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
-    <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
-    <div class="info-item">🕒 <span id="gameTimeDisplay">00:00</span></div>
-    <button class="help-button" id="helpButton">Справка</button>
-</div>
+        <div class="side-panel">
+            <div class="info-item">🍎 Очки: <span id="scoreDisplay">0</span></div>
+            <div class="info-item">💧 Мана: <span id="manaDisplay">0</span></div>
+            <div class="info-item">💩 <span id="poopEatenDisplay">0/5</span></div>
+            <div class="info-item">🏆 Рекорд: <span id="highScoreDisplay">0</span></div>
+            <div class="info-item">🕒 <span id="gameTimeDisplay">00:00</span></div>
+            <div class="ability-slots" style="display:flex; flex-direction:column; gap:4px; margin-top:8px;">
+                <div id="abilitySlot1" class="ability-slot" style="width:20px;height:20px;border:2px solid #aaa;background:#111;"></div>
+                <div id="abilitySlot2" class="ability-slot" style="width:20px;height:20px;border:2px solid #555;background:#222;opacity:0.4;"></div>
+                <div id="abilitySlot3" class="ability-slot" style="width:20px;height:20px;border:2px solid #555;background:#222;opacity:0.4;"></div>
+            </div>
+            <button class="abilities-button" id="abilitiesButton">Навыки</button>
+            <button class="help-button" id="helpButton">Справка</button>
+        </div>
         <canvas id="gameCanvas" width="400" height="400"></canvas>
-      <div id="hungerBarContainer">
-    <div id="hungerBarBg"></div>
-    <div id="hungerBarOverlay"></div>
-</div>
+        <div style="display: flex; flex-direction: row; gap: 8px;">
+            <div id="hungerBarContainer">
+                <div id="hungerBarBg"></div>
+                <div id="hungerBarOverlay"></div>
+            </div>
+            <div id="manaBarContainer">
+                <div id="manaBarBg"></div>
+            </div>
+        </div>
     </div>
     <div id="gameOverText" style="display: none;"></div>
 
@@ -164,14 +188,24 @@
         <p>Питаться и размножаться, защищать потомство.</p>
         <button id="phase2Button">Продолжить (пробел)</button>
     </div>
+    <div class="modal" id="cannibalModal">
+        <h2>Ад каннибалов</h2>
+        <p>Кусайтесь и выживете.</p>
+        <button id="cannibalButton">Продолжить (пробел)</button>
+    </div>
     <div class="modal" id="helpModal">
         <h2>Управление</h2>
         <p>Движение: стрелки<br>
-        Выстрел: Z<br>
-        Отложить яйцо / вылупить (если доступно): X<br>
-        Пауза: P<br>
-        Санация: S (накапливайте очки, чтобы восполнить заряды)</p>
+        Слот 1: A<br>
+        Слот 2: S<br>
+        Отложить яйцо / вылупить: X<br>
+        Пауза: P</p>
         <button id="closeHelpButton">Закрыть (H)</button>
+    </div>
+    <div class="modal" id="abilitiesModal">
+        <h2>Выбор навыков</h2>
+        <div id="abilitiesList" style="display:flex; flex-wrap:wrap; gap:10px; justify-content:center; margin:10px 0;"></div>
+        <button id="closeAbilitiesButton">Закрыть</button>
     </div>
 </div>
 
@@ -183,6 +217,6 @@
 <script src="babies.js"></script>
 <script src="jail.js"></script>
 <script src="input.js"></script>
-<script src="main.js"></script>
+<script src="mail.js"></script>
 </body>
 </html>
