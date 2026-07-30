@@ -214,7 +214,7 @@ function activateAbility(slot) {
 
     if (ability.id === 'tail_drop') {
         if (snake.length < 15) return;
-        const dropCount = Math.floor(snake.length * 0.4);
+        const dropCount = Math.floor(snake.length * 0.5);
         if (dropCount <= 0) return;
         const keepLength = snake.length - dropCount;
         if (keepLength < 1) return;
