@@ -4,7 +4,7 @@ function resetGame() {
     gameTimeSpan.textContent = '0';
     hungerBarOverlay.style.height = '0%';
     hungerBarBg.classList.remove('starving');
-    purchasedAbilities = [];
+
     if (animationFrameId) cancelAnimationFrame(animationFrameId);
     phase2Modal.classList.remove('active');
     helpModal.classList.remove('active');
@@ -12,7 +12,7 @@ function resetGame() {
     abilitiesModal.classList.remove('active');
     pauseStartTime = 0;
     snake = [{ x: 10, y: 10 }]; prevSnake = [{ x: 10, y: 10 }];
-    dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
+    dir = { x: 0, y: 0 };
     score = 0; playerPoopsEaten = 0; applesEaten = 0;
     scoreSpan.textContent = '0'; poopEatenSpan.textContent = '0/5'; gameOverDiv.textContent = '';
     gameRunning = true; gameOverFlag = false; paused = false;
@@ -46,22 +46,24 @@ function resetGame() {
     equippedAbilities = [null, null, null];
     abilityCooldowns = [0, 0, 0];
     tailSegments = [];
+    purchasedAbilities = [];
+    abilitySlotsUnlocked = [true, false, false];
     if (abilitySlots[0]) abilitySlots[0].innerHTML = '';
+    if (abilitySlots[1]) {
+        abilitySlots[1].innerHTML = '';
+        abilitySlots[1].style.background = '#222';
+        abilitySlots[1].style.borderColor = '#555';
+        abilitySlots[1].style.opacity = '0.4';
+    }
+    if (abilitySlots[2]) {
+        abilitySlots[2].innerHTML = '';
+        abilitySlots[2].style.background = '#222';
+        abilitySlots[2].style.borderColor = '#555';
+        abilitySlots[2].style.opacity = '0.4';
+    }
     generateFoods();
     lastUpdateTime = performance.now();
     animationFrameId = requestAnimationFrame(gameLoop);
-    abilitySlotsUnlocked = [true, false, false];
-// визуальный сброс второго и третьего слотов
-if (abilitySlots[1]) {
-    abilitySlots[1].style.background = '#222';
-    abilitySlots[1].style.borderColor = '#555';
-    abilitySlots[1].style.opacity = '0.4';
-}
-if (abilitySlots[2]) {
-    abilitySlots[2].style.background = '#222';
-    abilitySlots[2].style.borderColor = '#555';
-    abilitySlots[2].style.opacity = '0.4';
-}
 }
 
 function stopGame(msg) {
@@ -82,7 +84,7 @@ function stopGame(msg) {
     if (egg && !awaitingHatch && gameRunning) {
         awaitingHatch = true;
         gameOverLines = ['Нажмите X, чтобы вылупиться'];
-        snake = []; prevSnake = []; dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
+        snake = []; prevSnake = []; dir = { x: 0, y: 0 };
         gameRunning = false;
         bullet = null; jailMode = false; awaitingJailStart = false; jailCountdown = false;
         return;
@@ -112,67 +114,71 @@ function toggleHelp() {
     }
 }
 
-// Привязка кнопок модальных окон
+// Привязка кнопок
 startButton.addEventListener('click', startGameFromModal);
 phase2Button.addEventListener('click', continueFromPhase2);
 helpButton.addEventListener('click', toggleHelp);
 closeHelpButton.addEventListener('click', () => helpModal.classList.remove('active'));
 cannibalButton.addEventListener('click', () => cannibalModal.classList.remove('active'));
+closeAbilitiesButton.addEventListener('click', () => abilitiesModal.classList.remove('active'));
 
-// Обработчик модалки навыков
+// Модалка навыков
 abilitiesButton.addEventListener('click', () => {
     if (abilitiesModal.classList.contains('active')) {
         abilitiesModal.classList.remove('active');
     } else {
         abilitiesList.innerHTML = '';
-        const ability = {
-            id: 'tail_drop',
-            name: 'Отбрасывание хвоста',
-            icon: '🦎',
-            cost: 50,        // стоимость в мане
-            cooldown: 15,    // кулдаун в секундах
-            price: 300,      // стоимость покупки в очках
-            description: 'Сбросить 50% длины (мин. 15 клеток)'
-        };
 
-        const isPurchased = purchasedAbilities.includes(ability.id);
-        const div = document.createElement('div');
-        div.style.cssText = 'width:80px; height:100px; border:2px solid #aaa; text-align:center; font-size:24px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#16213e; margin:5px;';
+        const allAbilities = [
+            { id: 'tail_drop', name: 'Отбрасывание хвоста', icon: '🦎', cost: 50, cooldown: 15, price: 300, description: 'Сбросить 50% длины (мин. 15 клеток)' },
+            { id: 'bullet', name: 'Выстрел', icon: '🔫', cost: 5, cooldown: 0, price: 100, description: 'Пуля (1 фаза)' },
+            { id: 'laser', name: 'Лазер', icon: '⚡', cost: 10, cooldown: 2, price: 400, description: 'Лазер (фазы 2-3)' },
+            { id: 'sanitation', name: 'Санация', icon: '🧹', cost: 30, cooldown: 30, price: 500, description: 'Убить всех стервятников (фазы 2-3)' }
+        ];
 
-        if (!isPurchased) {
-            // Не куплена — показываем цену и кнопку покупки
-            div.innerHTML = `
-                <span>${ability.icon}</span>
-                <small style="font-size:10px;color:white;">${ability.name}</small>
-                <button style="margin-top:5px;padding:2px 8px;font-size:12px;background:#e94560;border:none;color:white;border-radius:4px;cursor:pointer;">Купить (${ability.price})</button>
-            `;
-            div.querySelector('button').onclick = (e) => {
-                e.stopPropagation(); // чтобы не сработал клик по div
-                if (score >= ability.price) {
-                    score -= ability.price;
-                    scoreSpan.textContent = score;
-                    purchasedAbilities.push(ability.id);
-                    // После покупки сразу экипируем
-                    equippedAbilities[0] = ability;
-                    if (abilitySlots[0]) abilitySlots[0].innerHTML = ability.icon;
-                    abilitiesModal.classList.remove('active');
+        for (const ability of allAbilities) {
+            const isPurchased = purchasedAbilities.includes(ability.id);
+            const div = document.createElement('div');
+            div.style.cssText = 'width:80px; height:110px; border:2px solid #aaa; text-align:center; font-size:24px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#16213e; margin:5px;';
+
+            const tryEquip = () => {
+                for (let i = 0; i < abilitySlots.length; i++) {
+                    if (abilitySlotsUnlocked[i] && equippedAbilities[i] === null) {
+                        equippedAbilities[i] = ability;
+                        if (abilitySlots[i]) abilitySlots[i].innerHTML = ability.icon;
+                        return true;
+                    }
                 }
+                return false;
             };
-        } else {
-            // Уже куплена — можно просто выбрать
-            div.innerHTML = `<span>${ability.icon}</span><small style="font-size:10px;color:white;">${ability.name}</small>`;
-            div.onclick = () => {
-                equippedAbilities[0] = ability;
-                if (abilitySlots[0]) abilitySlots[0].innerHTML = ability.icon;
-                abilitiesModal.classList.remove('active');
-            };
+
+            if (!isPurchased) {
+                div.innerHTML = `
+                    <span>${ability.icon}</span>
+                    <small style="font-size:10px;color:white;">${ability.name}</small>
+                    <button style="margin-top:5px;padding:2px 8px;font-size:12px;background:#e94560;border:none;color:white;border-radius:4px;cursor:pointer;">Купить (${ability.price})</button>
+                `;
+                div.querySelector('button').onclick = (e) => {
+                    e.stopPropagation();
+                    if (score >= ability.price) {
+                        score -= ability.price;
+                        scoreSpan.textContent = score;
+                        purchasedAbilities.push(ability.id);
+                        tryEquip();
+                        abilitiesModal.classList.remove('active');
+                    }
+                };
+            } else {
+                div.innerHTML = `<span>${ability.icon}</span><small style="font-size:10px;color:white;">${ability.name}</small>`;
+                div.onclick = () => {
+                    tryEquip();
+                    abilitiesModal.classList.remove('active');
+                };
+            }
+            abilitiesList.appendChild(div);
         }
-        abilitiesList.appendChild(div);
         abilitiesModal.classList.add('active');
     }
-});
-closeAbilitiesButton.addEventListener('click', () => {
-    abilitiesModal.classList.remove('active');
 });
 
 function updateBullet() {
@@ -217,8 +223,21 @@ function updatePoison() {
     }
 }
 
+function unlockAbilitySlot(index) {
+    if (index < 0 || index >= abilitySlots.length) return;
+    abilitySlotsUnlocked[index] = true;
+    const slot = abilitySlots[index];
+    if (slot) {
+        slot.style.background = '#111';
+        slot.style.borderColor = '#aaa';
+        slot.style.opacity = '1';
+    }
+}
+window.unlockAbilitySlot = unlockAbilitySlot;
+
 function activateAbility(slot) {
     if (!gameRunning || paused || jailMode || jailCountdown || awaitingHatch || awaitingJailStart) return;
+    if (!abilitySlotsUnlocked[slot]) return;
     const ability = equippedAbilities[slot];
     if (!ability) return;
     if (performance.now() < abilityCooldowns[slot]) return;
@@ -230,19 +249,47 @@ function activateAbility(slot) {
         if (dropCount <= 0) return;
         const keepLength = snake.length - dropCount;
         if (keepLength < 1) return;
-
         const dropped = snake.splice(keepLength);
         prevSnake = snake.map(s => ({...s}));
-
         const now = performance.now();
         for (const seg of dropped) {
             tailSegments.push({ x: seg.x, y: seg.y, life: 500 });
         }
-
         mana -= ability.cost;
         manaSpan.textContent = mana;
         if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
         abilityCooldowns[slot] = now + ability.cooldown * 1000;
+    }
+    else if (ability.id === 'bullet') {
+        if (worldDiscovered) return;
+        if (bullet) return;
+        if (!dir.x && !dir.y) return;
+        bullet = { x: snake[0].x + dir.x, y: snake[0].y + dir.y, dirX: dir.x, dirY: dir.y };
+        prevBullet = null;
+        mana -= ability.cost;
+        manaSpan.textContent = mana;
+        if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
+    }
+    else if (ability.id === 'laser') {
+        if (!worldDiscovered) return;
+        if (!dir.x && !dir.y) return;
+        fireLaser();
+        mana -= ability.cost;
+        manaSpan.textContent = mana;
+        if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
+        abilityCooldowns[slot] = performance.now() + ability.cooldown * 1000;
+    }
+    else if (ability.id === 'sanitation') {
+        if (!worldDiscovered || vultures.length === 0) return;
+        vultures = [];
+        prevVultures = [];
+        flashStart = performance.now();
+        awaitingJailStart = true;
+        awaitingJailReason = 'Массовое убийство';
+        mana -= ability.cost;
+        manaSpan.textContent = mana;
+        if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
+        abilityCooldowns[slot] = performance.now() + ability.cooldown * 1000;
     }
 }
 window.activateAbility = activateAbility;
@@ -318,7 +365,6 @@ function updateGame() {
 
     updateBabies();
 
-    // Обновление исчезающих сегментов хвоста
     tailSegments = tailSegments.filter(seg => {
         seg.life -= 16;
         return seg.life > 0;
