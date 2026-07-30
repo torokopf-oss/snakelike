@@ -117,18 +117,44 @@ abilitiesButton.addEventListener('click', () => {
             id: 'tail_drop',
             name: 'Отбрасывание хвоста',
             icon: '🦎',
-            cost: 50,
-            cooldown: 15,
-            description: 'Сбросить 40% длины (мин. 15 клеток)'
+            cost: 50,        // стоимость в мане
+            cooldown: 15,    // кулдаун в секундах
+            price: 300,      // стоимость покупки в очках
+            description: 'Сбросить 50% длины (мин. 15 клеток)'
         };
+
+        const isPurchased = purchasedAbilities.includes(ability.id);
         const div = document.createElement('div');
-        div.style.cssText = 'width:60px;height:60px;border:2px solid #aaa;text-align:center;font-size:24px;cursor:pointer;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#16213e;';
-        div.innerHTML = `<span>${ability.icon}</span><small style="font-size:10px;color:white;">${ability.name}</small>`;
-        div.onclick = () => {
-            equippedAbilities[0] = ability;
-            if (abilitySlots[0]) abilitySlots[0].innerHTML = ability.icon;
-            abilitiesModal.classList.remove('active');
-        };
+        div.style.cssText = 'width:80px; height:100px; border:2px solid #aaa; text-align:center; font-size:24px; cursor:pointer; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#16213e; margin:5px;';
+
+        if (!isPurchased) {
+            // Не куплена — показываем цену и кнопку покупки
+            div.innerHTML = `
+                <span>${ability.icon}</span>
+                <small style="font-size:10px;color:white;">${ability.name}</small>
+                <button style="margin-top:5px;padding:2px 8px;font-size:12px;background:#e94560;border:none;color:white;border-radius:4px;cursor:pointer;">Купить (${ability.price})</button>
+            `;
+            div.querySelector('button').onclick = (e) => {
+                e.stopPropagation(); // чтобы не сработал клик по div
+                if (score >= ability.price) {
+                    score -= ability.price;
+                    scoreSpan.textContent = score;
+                    purchasedAbilities.push(ability.id);
+                    // После покупки сразу экипируем
+                    equippedAbilities[0] = ability;
+                    if (abilitySlots[0]) abilitySlots[0].innerHTML = ability.icon;
+                    abilitiesModal.classList.remove('active');
+                }
+            };
+        } else {
+            // Уже куплена — можно просто выбрать
+            div.innerHTML = `<span>${ability.icon}</span><small style="font-size:10px;color:white;">${ability.name}</small>`;
+            div.onclick = () => {
+                equippedAbilities[0] = ability;
+                if (abilitySlots[0]) abilitySlots[0].innerHTML = ability.icon;
+                abilitiesModal.classList.remove('active');
+            };
+        }
         abilitiesList.appendChild(div);
         abilitiesModal.classList.add('active');
     }
