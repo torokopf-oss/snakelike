@@ -68,7 +68,12 @@ window.addEventListener('keydown', e => {
         }
         return;
     }
-
+if (e.code === 'KeyY') {
+    if (!nightmareMode) {
+        startNightmare();
+    }
+    return;
+}
     if (e.code === 'BracketRight') { activateCheats(); return; }
 
     // Клавиша C больше не используется для санации
