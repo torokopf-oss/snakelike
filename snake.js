@@ -124,26 +124,39 @@ function updatePlayer() {
 
     let ateApple = false;
     for (let i = foods.length - 1; i >= 0; i--) {
-        if (newHead.x === foods[i].x && newHead.y === foods[i].y) {
-            foods.splice(i, 1);
-            lastAppleTime = performance.now();
-            isStarving = false;
-            ateApple = true;
-            applesEaten++;
-            score += 10 + snake.length;
-            scoreSpan.textContent = score;
-            mana = Math.min(mana + 10, MAX_MANA);
-            manaSpan.textContent = mana;
-            if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
-            snake[snake.length - 1].glowUntil = performance.now() + 500;
-            break;
-        }
+     if (newHead.x === foods[i].x && newHead.y === foods[i].y) {
+    foods.splice(i, 1);
+    lastAppleTime = performance.now();
+    isStarving = false;
+    ateApple = true;
+    
+    if (nightmareMode) {
+        nightmareApplesEaten++;
+        // В сне можно давать очки или нет — по желанию. Пусть начисляются, это не принципиально.
+        score += 10 + snake.length;
+        scoreSpan.textContent = score;
+        // Ману не увеличиваем (или увеличиваем — не важно)
+    } else {
+        applesEaten++;
+        score += 10 + snake.length;
+        scoreSpan.textContent = score;
+        mana = Math.min(mana + 10, MAX_MANA);
+        manaSpan.textContent = mana;
+        if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
     }
-    if (ateApple) {
+    
+    snake[snake.length - 1].glowUntil = performance.now() + 500;
+    break;
+}
+    }
+ if (ateApple) {
+    if (!nightmareMode) {
         pushNewFoodCell();
         if (applesEaten % 2 === 0) { spawnPoop(); updateWarning(); }
         foods.forEach(f => moveFoodLazy(f));
     }
+    // В сне ничего не делаем — яблоко просто исчезло, новых не появляется
+}
 
     if (willEatPoop) {
         if (snake.length <= 2) { stopGame('Змейка отравилась!'); return; }
