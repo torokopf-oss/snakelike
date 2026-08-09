@@ -85,7 +85,12 @@ window.addEventListener('keydown', e => {
         }
         return;
     }
-
+if (e.code === 'KeyT') {
+    if (gameRunning && !nightmareMode && !jailMode && !awaitingHatch) {
+        forcePhase3();
+    }
+    return;
+}
     // Остальное только при активной игре
     if (!gameRunning || awaitingHatch || paused) return;
 
