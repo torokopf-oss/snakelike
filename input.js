@@ -1,5 +1,5 @@
 window.addEventListener('keydown', e => {
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH','KeyA','KeyC'].includes(e.code)) {
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH','KeyA','KeyT','KeyC'].includes(e.code)) {
         e.preventDefault();
     }
 
