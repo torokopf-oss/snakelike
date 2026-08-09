@@ -482,5 +482,37 @@ function gameLoop(now) {
     drawGame(t, now);
     animationFrameId = requestAnimationFrame(gameLoop);
 }
+function forcePhase3() {
+    // Открываем мир полностью
+    worldDiscovered = true;
+    worldDiscoveredDown = true;
+    canvas.width = CONFIG.fullWidth * CONFIG.gridSize;   // 800px
+    canvas.height = CONFIG.fullHeight * CONFIG.gridSize;  // 800px
 
+    // Сбрасываем счётчик яблок для вызова стервятников (чтобы сразу не прилетели)
+    applesEaten = 0;
+
+    // Генерируем еду на всём поле
+    generateFoods();
+
+    // Создаём 5 детёнышей для теста (длина 3, случайные позиции)
+    for (let i = 0; i < 5; i++) {
+        const start = randomFreeCell(true);
+        if (!start) continue;
+        const d = { x: 1, y: 0 }; // направление по умолчанию
+        const baby = [
+            { x: start.x, y: start.y },
+            { x: start.x - d.x, y: start.y - d.y },
+            { x: start.x - d.x * 2, y: start.y - d.y * 2 }
+        ];
+        babySnakes.push(baby);
+        babyPrevSnakes.push(baby.map(s => ({...s})));
+        babyDirections.push({ ...d });
+        babyFleeing.push({ active: false });
+    }
+    hadBabies = true;
+
+    // Показываем окно «Ад каннибалов»
+    cannibalModal.classList.add('active');
+}
 startModal.classList.add('active');
