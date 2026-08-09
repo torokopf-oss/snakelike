@@ -49,6 +49,8 @@ let poops = [];
 let applesEaten = 0;
 let poisonActive = false, lastPoisonCheck = 0;
 let pill = null;
+let nightmareMode = false;
+let nightmareApplesEaten = 0;
 let sickParticles = [];
 let lastAppleTime = 0;
 let isStarving = false;

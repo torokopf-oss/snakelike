@@ -40,6 +40,8 @@ function resetGame() {
     vultures = []; prevVultures = []; vulturesPerWave = 1; vultureMoveCounter = 0;
     moveQueue = [];
     jailMoveQueue = [];
+    nightmareMode = false;
+    nightmareApplesEaten = 0;
     mana = 0;
     manaSpan.textContent = mana;
     if (manaBarBg) manaBarBg.style.height = '0%';
@@ -72,6 +74,19 @@ function stopGame(msg) {
     const finalScore = score + timeBonus;
     const reason = msg || 'Игра окончена!';
     const scoreLine = `Счёт: ${finalScore} (${score} + ${timeSec} сек)`;
+    if (nightmareMode) {
+    gameRunning = false;
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    if (nightmareApplesEaten >= 100) {
+        // Пройдено — выход в обычную игру
+        nightmareMode = false;
+        resetGame(); // обычный старт
+    } else {
+        // Не пройдено — перезапуск сна
+        startNightmare();
+    }
+    return;
+}
     if (msg === 'Потомство уничтожено') {
         gameRunning = false; gameOverFlag = true;
         if (animationFrameId) cancelAnimationFrame(animationFrameId);
@@ -300,6 +315,62 @@ function updateManaBar() {
         manaBarBg.style.height = percent + '%';
     }
 }
+function startNightmare() {
+    // Остановить текущий цикл, если есть
+    if (animationFrameId) cancelAnimationFrame(animationFrameId);
+    // Сбросить все состояния обычной игры
+    gameRunning = false; gameOverFlag = false; paused = false;
+    poisonActive = false; pill = null; sickParticles = [];
+    poops = [];
+    poopSnake = []; prevPoopSnake = []; poopSnakeActive = false;
+    poopSnakeNextThreshold = CONFIG.poopThresholdStart;
+    poopSnakeJustSpawned = false; warningActive = false; warningPulse = 0;
+    bullet = null; prevBullet = null;
+    jailMode = false; jailSnake = []; jailPrevSnake = []; awaitingJailStart = false;
+    jailCountdown = false; flashStart = 0; laserStart = 0;
+    worldDiscovered = false; worldDiscoveredDown = false;
+    canvas.width = 400; canvas.height = 400;
+    egg = null; eggCooldown = 0; firstEggLaid = false; eggAppleCounter = 0;
+    lastEggTime = 0; lastAppleTime = performance.now();
+    isStarving = false; lastHungerTick = 0;
+    babySnakes = []; babyPrevSnakes = []; babyDirections = []; awaitingHatch = false; hadBabies = false;
+    babyFleeing = [];
+    vultures = []; prevVultures = []; vulturesPerWave = 1; vultureMoveCounter = 0;
+    moveQueue = []; jailMoveQueue = [];
+    mana = 0; if (manaBarBg) manaBarBg.style.height = '0%';
+    equippedAbilities = [null, null, null]; abilityCooldowns = [0, 0, 0];
+    tailSegments = []; purchasedAbilities = [];
+    abilitySlotsUnlocked = [true, false, false];
+    if (abilitySlots[0]) abilitySlots[0].innerHTML = '';
+    // Закрыть все модальные окна
+    startModal.classList.remove('active');
+    phase2Modal.classList.remove('active');
+    cannibalModal.classList.remove('active');
+    helpModal.classList.remove('active');
+    abilitiesModal.classList.remove('active');
+    
+    // Настройка «Страшного сна»
+    nightmareMode = true;
+    nightmareApplesEaten = 0;
+    // Змейка в центре, длина 1
+    snake = [{ x: 10, y: 10 }]; // поле 20x20, центр примерно
+    prevSnake = [{ x: 10, y: 10 }];
+    dir = { x: 0, y: 0 }; nextDir = { x: 0, y: 0 };
+    // Заполнить всё поле яблоками, кроме клетки змейки
+    foods = [];
+    for (let x = 0; x < CONFIG.viewWidth; x++) {
+        for (let y = 0; y < CONFIG.viewHeight; y++) {
+            if (x !== snake[0].x || y !== snake[0].y) {
+                foods.push({ x, y });
+            }
+        }
+    }
+    prevFoods = foods.map(f => ({...f}));
+    score = 0; scoreSpan.textContent = '0';
+    gameRunning = true;
+    lastUpdateTime = performance.now();
+    animationFrameId = requestAnimationFrame(gameLoop);
+}
 
 function updateGame() {
     if (gameRunning && !paused && !jailMode && !awaitingJailStart && !awaitingHatch &&
@@ -322,7 +393,14 @@ function updateGame() {
     if (jailCountdown) { updateCountdown(); return; }
     if (jailMode) { updateJail(); return; }
     if (awaitingHatch) return;
-
+if (nightmareMode) {
+    // В сне работают только движение и поедание яблок
+    prevSnake = snake.map(s => ({...s}));
+    prevFoods = foods.map(f => ({...f}));
+    updatePlayer(); // внутри будет спецобработка яблок
+    // Никаких врагов, голода, фаз, яиц
+    return;
+}
     if (!sanitationMilestoneReached && score >= 1000) {
         sanitationCharges += 2;
         sanitationMilestoneReached = true;
@@ -404,5 +482,37 @@ function gameLoop(now) {
     drawGame(t, now);
     animationFrameId = requestAnimationFrame(gameLoop);
 }
+function forcePhase3() {
+    // Открываем мир полностью
+    worldDiscovered = true;
+    worldDiscoveredDown = true;
+    canvas.width = CONFIG.fullWidth * CONFIG.gridSize;   // 800px
+    canvas.height = CONFIG.fullHeight * CONFIG.gridSize;  // 800px
 
+    // Сбрасываем счётчик яблок для вызова стервятников (чтобы сразу не прилетели)
+    applesEaten = 0;
+
+    // Генерируем еду на всём поле
+    generateFoods();
+
+    // Создаём 5 детёнышей для теста (длина 3, случайные позиции)
+    for (let i = 0; i < 5; i++) {
+        const start = randomFreeCell(true);
+        if (!start) continue;
+        const d = { x: 1, y: 0 }; // направление по умолчанию
+        const baby = [
+            { x: start.x, y: start.y },
+            { x: start.x - d.x, y: start.y - d.y },
+            { x: start.x - d.x * 2, y: start.y - d.y * 2 }
+        ];
+        babySnakes.push(baby);
+        babyPrevSnakes.push(baby.map(s => ({...s})));
+        babyDirections.push({ ...d });
+        babyFleeing.push({ active: false });
+    }
+    hadBabies = true;
+
+    // Показываем окно «Ад каннибалов»
+    cannibalModal.classList.add('active');
+}
 startModal.classList.add('active');

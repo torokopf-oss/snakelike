@@ -37,17 +37,18 @@ function updateBabies() {
                     else desiredDir.x = dx > 0 ? 1 : -1;
                 } else {
                     let biteTarget = null;
-                    if (snake.length > 1) {
-                        let minDist = Infinity;
-                        for (let i = 1; i < snake.length; i++) {
-                            const seg = snake[i];
-                            const d = Math.abs(seg.x - head.x) + Math.abs(seg.y - head.y);
-                            if (d < minDist) {
-                                minDist = d;
-                                biteTarget = seg;
-                            }
-                        }
-                    }
+                   if (snake.length >= 1) {
+    let minDist = Infinity;
+    const startIdx = (snake.length === 1) ? 0 : 1;
+    for (let i = startIdx; i < snake.length; i++) {
+        const seg = snake[i];
+        const d = Math.abs(seg.x - head.x) + Math.abs(seg.y - head.y);
+        if (d < minDist) {
+            minDist = d;
+            biteTarget = seg;
+        }
+    }
+}
                     if (biteTarget) {
                         const dx = biteTarget.x - head.x;
                         const dy = biteTarget.y - head.y;
@@ -125,7 +126,7 @@ function updateBabies() {
         }
 
         // ---------- Столкновение с головой игрока в третьей фазе ----------
-        if (worldDiscoveredDown && snake.length > 0 && snake[0].x === newHead.x && snake[0].y === newHead.y) {
+        if (worldDiscoveredDown && snake.length > 1 && snake[0].x === newHead.x && snake[0].y === newHead.y) {
             // Обрабатывается в updatePlayer, здесь просто удаляем
             babySnakes.splice(b, 1); babyPrevSnakes.splice(b, 1); babyDirections.splice(b, 1);
             babyFleeing.splice(b, 1);

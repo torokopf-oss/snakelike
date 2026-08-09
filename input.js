@@ -1,5 +1,5 @@
 window.addEventListener('keydown', e => {
-    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH','KeyA','KeyC'].includes(e.code)) {
+    if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','Space','KeyZ','KeyX','KeyS','KeyP','BracketRight','KeyH','KeyA','KeyT','KeyC'].includes(e.code)) {
         e.preventDefault();
     }
 
@@ -68,7 +68,12 @@ window.addEventListener('keydown', e => {
         }
         return;
     }
-
+if (e.code === 'KeyY') {
+    if (!nightmareMode) {
+        startNightmare();
+    }
+    return;
+}
     if (e.code === 'BracketRight') { activateCheats(); return; }
 
     // Клавиша C больше не используется для санации
@@ -83,7 +88,12 @@ window.addEventListener('keydown', e => {
         if (window.activateAbility) window.activateAbility(1);
         return;
     }
-
+if (e.code === 'KeyT') {
+    if (gameRunning && !nightmareMode && !jailMode && !awaitingHatch) {
+        forcePhase3();
+    }
+    return;
+}
     if (jailMode) {
         const newDir = getDirectionFromCode(e.code);
         if (!newDir) return;

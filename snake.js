@@ -65,54 +65,42 @@ function updatePlayer() {
                 break;
             }
         }
-        if (babyBiteInfo) {
-            if (babyBiteInfo.isHead) {
-                if (snake.length <= 1) {
-                    stopGame('Вас убил детёныш!');
-                    return;
-                }
-                const baby = babySnakes[babyBiteInfo.b];
-                for (const seg of baby) {
-                    const fi = foods.findIndex(f => f.x === seg.x && f.y === seg.y);
-                    if (fi !== -1) foods.splice(fi, 1);
-                    const pi = poops.findIndex(p => p.x === seg.x && p.y === seg.y);
-                    if (pi !== -1) poops.splice(pi, 1);
-                    if (pill && pill.x === seg.x && pill.y === seg.y) pill = null;
-                    if (egg && egg.x === seg.x && egg.y === seg.y) egg = null;
-                    foods.push({ x: seg.x, y: seg.y });
-                }
-                prevFoods = foods.map(f => ({...f}));
-                babySnakes.splice(babyBiteInfo.b, 1);
-                babyPrevSnakes.splice(babyBiteInfo.b, 1);
-                babyDirections.splice(babyBiteInfo.b, 1);
-                babyFleeing.splice(babyBiteInfo.b, 1);
-                score += 50;
-                scoreSpan.textContent = score;
-            } else {
-                const baby = babySnakes[babyBiteInfo.b];
-                const oldTail = snake[snake.length - 1];
-                snake.unshift(newHead);
-                prevSnake.push({ ...oldTail });
-                if (baby.length <= 1) {
-                    babySnakes.splice(babyBiteInfo.b, 1);
-                    babyPrevSnakes.splice(babyBiteInfo.b, 1);
-                    babyDirections.splice(babyBiteInfo.b, 1);
-                    babyFleeing.splice(babyBiteInfo.b, 1);
-                } else {
-                    baby.pop();
-                }
-                const fi = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
-                if (fi !== -1) foods.splice(fi, 1);
-                const pi = poops.findIndex(p => p.x === newHead.x && p.y === newHead.y);
-                if (pi !== -1) poops.splice(pi, 1);
-                if (pill && pill.x === newHead.x && pill.y === newHead.y) pill = null;
-                if (egg && egg.x === newHead.x && egg.y === newHead.y) egg = null;
-                score += 20;
-                scoreSpan.textContent = score;
-                if (eggCooldown > 0) eggCooldown--;
-                return;
-            }
-        }
+      if (babyBiteInfo) {
+    const baby = babySnakes[babyBiteInfo.b];
+
+    // Если игрок длиной 1 и столкнулся с головой детёныша — смерть
+    if (snake.length <= 1 && babyBiteInfo.isHead) {
+        stopGame('Вас убил детёныш!');
+        return;
+    }
+
+    // В остальных случаях игрок съедает сегмент (голову или тело)
+    const oldTail = snake[snake.length - 1];
+    snake.unshift(newHead);
+    prevSnake.push({ ...oldTail });   // игрок растёт
+
+    // Уменьшаем детёныша на 1 клетку
+    if (baby.length <= 1) {
+        babySnakes.splice(babyBiteInfo.b, 1);
+        babyPrevSnakes.splice(babyBiteInfo.b, 1);
+        babyDirections.splice(babyBiteInfo.b, 1);
+        babyFleeing.splice(babyBiteInfo.b, 1);
+    } else {
+        baby.pop();
+    }
+
+    // Очистка клетки и начисление очков
+    const fi = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
+    if (fi !== -1) foods.splice(fi, 1);
+    const pi = poops.findIndex(p => p.x === newHead.x && p.y === newHead.y);
+    if (pi !== -1) poops.splice(pi, 1);
+    if (pill && pill.x === newHead.x && pill.y === newHead.y) pill = null;
+    if (egg && egg.x === newHead.x && egg.y === newHead.y) egg = null;
+    score += 20;
+    scoreSpan.textContent = score;
+    if (eggCooldown > 0) eggCooldown--;
+    return;
+}
     }
 
     const willEatFood = foods.some(f => f.x === newHead.x && f.y === newHead.y);
@@ -124,26 +112,39 @@ function updatePlayer() {
 
     let ateApple = false;
     for (let i = foods.length - 1; i >= 0; i--) {
-        if (newHead.x === foods[i].x && newHead.y === foods[i].y) {
-            foods.splice(i, 1);
-            lastAppleTime = performance.now();
-            isStarving = false;
-            ateApple = true;
-            applesEaten++;
-            score += 10 + snake.length;
-            scoreSpan.textContent = score;
-            mana = Math.min(mana + 10, MAX_MANA);
-            manaSpan.textContent = mana;
-            if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
-            snake[snake.length - 1].glowUntil = performance.now() + 500;
-            break;
-        }
+     if (newHead.x === foods[i].x && newHead.y === foods[i].y) {
+    foods.splice(i, 1);
+    lastAppleTime = performance.now();
+    isStarving = false;
+    ateApple = true;
+    
+    if (nightmareMode) {
+        nightmareApplesEaten++;
+        // В сне можно давать очки или нет — по желанию. Пусть начисляются, это не принципиально.
+        score += 10 + snake.length;
+        scoreSpan.textContent = score;
+        // Ману не увеличиваем (или увеличиваем — не важно)
+    } else {
+        applesEaten++;
+        score += 10 + snake.length;
+        scoreSpan.textContent = score;
+        mana = Math.min(mana + 10, MAX_MANA);
+        manaSpan.textContent = mana;
+        if (manaBarBg) manaBarBg.style.height = (mana / MAX_MANA) * 100 + '%';
     }
-    if (ateApple) {
+    
+    snake[snake.length - 1].glowUntil = performance.now() + 500;
+    break;
+}
+    }
+ if (ateApple) {
+    if (!nightmareMode) {
         pushNewFoodCell();
         if (applesEaten % 2 === 0) { spawnPoop(); updateWarning(); }
         foods.forEach(f => moveFoodLazy(f));
     }
+    // В сне ничего не делаем — яблоко просто исчезло, новых не появляется
+}
 
     if (willEatPoop) {
         if (snake.length <= 2) { stopGame('Змейка отравилась!'); return; }
