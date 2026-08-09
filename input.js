@@ -88,7 +88,12 @@ if (e.code === 'KeyY') {
         if (window.activateAbility) window.activateAbility(1);
         return;
     }
-
+if (e.code === 'KeyT') {
+    if (gameRunning && !nightmareMode && !jailMode && !awaitingHatch) {
+        forcePhase3();
+    }
+    return;
+}
     if (jailMode) {
         const newDir = getDirectionFromCode(e.code);
         if (!newDir) return;
