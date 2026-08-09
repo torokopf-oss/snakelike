@@ -65,54 +65,42 @@ function updatePlayer() {
                 break;
             }
         }
-        if (babyBiteInfo) {
-            if (babyBiteInfo.isHead) {
-                if (snake.length <= 1) {
-                    stopGame('Вас убил детёныш!');
-                    return;
-                }
-                const baby = babySnakes[babyBiteInfo.b];
-                for (const seg of baby) {
-                    const fi = foods.findIndex(f => f.x === seg.x && f.y === seg.y);
-                    if (fi !== -1) foods.splice(fi, 1);
-                    const pi = poops.findIndex(p => p.x === seg.x && p.y === seg.y);
-                    if (pi !== -1) poops.splice(pi, 1);
-                    if (pill && pill.x === seg.x && pill.y === seg.y) pill = null;
-                    if (egg && egg.x === seg.x && egg.y === seg.y) egg = null;
-                    foods.push({ x: seg.x, y: seg.y });
-                }
-                prevFoods = foods.map(f => ({...f}));
-                babySnakes.splice(babyBiteInfo.b, 1);
-                babyPrevSnakes.splice(babyBiteInfo.b, 1);
-                babyDirections.splice(babyBiteInfo.b, 1);
-                babyFleeing.splice(babyBiteInfo.b, 1);
-                score += 50;
-                scoreSpan.textContent = score;
-            } else {
-                const baby = babySnakes[babyBiteInfo.b];
-                const oldTail = snake[snake.length - 1];
-                snake.unshift(newHead);
-                prevSnake.push({ ...oldTail });
-                if (baby.length <= 1) {
-                    babySnakes.splice(babyBiteInfo.b, 1);
-                    babyPrevSnakes.splice(babyBiteInfo.b, 1);
-                    babyDirections.splice(babyBiteInfo.b, 1);
-                    babyFleeing.splice(babyBiteInfo.b, 1);
-                } else {
-                    baby.pop();
-                }
-                const fi = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
-                if (fi !== -1) foods.splice(fi, 1);
-                const pi = poops.findIndex(p => p.x === newHead.x && p.y === newHead.y);
-                if (pi !== -1) poops.splice(pi, 1);
-                if (pill && pill.x === newHead.x && pill.y === newHead.y) pill = null;
-                if (egg && egg.x === newHead.x && egg.y === newHead.y) egg = null;
-                score += 20;
-                scoreSpan.textContent = score;
-                if (eggCooldown > 0) eggCooldown--;
-                return;
-            }
-        }
+      if (babyBiteInfo) {
+    const baby = babySnakes[babyBiteInfo.b];
+
+    // Если игрок длиной 1 и столкнулся с головой детёныша — смерть
+    if (snake.length <= 1 && babyBiteInfo.isHead) {
+        stopGame('Вас убил детёныш!');
+        return;
+    }
+
+    // В остальных случаях игрок съедает сегмент (голову или тело)
+    const oldTail = snake[snake.length - 1];
+    snake.unshift(newHead);
+    prevSnake.push({ ...oldTail });   // игрок растёт
+
+    // Уменьшаем детёныша на 1 клетку
+    if (baby.length <= 1) {
+        babySnakes.splice(babyBiteInfo.b, 1);
+        babyPrevSnakes.splice(babyBiteInfo.b, 1);
+        babyDirections.splice(babyBiteInfo.b, 1);
+        babyFleeing.splice(babyBiteInfo.b, 1);
+    } else {
+        baby.pop();
+    }
+
+    // Очистка клетки и начисление очков
+    const fi = foods.findIndex(f => f.x === newHead.x && f.y === newHead.y);
+    if (fi !== -1) foods.splice(fi, 1);
+    const pi = poops.findIndex(p => p.x === newHead.x && p.y === newHead.y);
+    if (pi !== -1) poops.splice(pi, 1);
+    if (pill && pill.x === newHead.x && pill.y === newHead.y) pill = null;
+    if (egg && egg.x === newHead.x && egg.y === newHead.y) egg = null;
+    score += 20;
+    scoreSpan.textContent = score;
+    if (eggCooldown > 0) eggCooldown--;
+    return;
+}
     }
 
     const willEatFood = foods.some(f => f.x === newHead.x && f.y === newHead.y);
