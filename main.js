@@ -231,7 +231,9 @@ function gameLoop(now) {
     const elapsed = now - lastUpdateTime;
     if (elapsed >= CONFIG.snakeSpeed) { updateGame(); lastUpdateTime += CONFIG.snakeSpeed; }
     sickParticles = sickParticles.filter(p => (p.x += p.vx*16/1000, p.y += p.vy*16/1000, p.life -= 16) > 0);
-    const t = gameRunning ? Math.min((now - lastUpdateTime) / CONFIG.snakeSpeed, 1) : 1;
+    // Пока ждём нажатия пробела перед тюрьмой, мир стоит на месте: рисуем без анимации (t = 1),
+    // иначе объекты "дёргаются" между предыдущей и текущей клетками.
+    const t = (gameRunning && !awaitingJailStart) ? Math.min((now - lastUpdateTime) / CONFIG.snakeSpeed, 1) : 1;
     drawGame(t, now);
     animationFrameId = requestAnimationFrame(gameLoop);
 }
